@@ -1,0 +1,247 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { motion } from 'framer-motion';
+import { Edit2, Loader2, PlayCircle, Settings, User } from 'lucide-react';
+import type React from 'react';
+import { useState } from 'react';
+import { db } from '../db/database';
+import { useSudokuWorker } from '../hooks/useSudokuWorker';
+import { useGameStore } from '../store/gameStore';
+import type { Difficulty } from '../types';
+import Button from './Button';
+import PlayerMenu from './PlayerMenu';
+import SettingsMenu from './SettingsMenu';
+
+const MainMenuScreen: React.FC = () => {
+	const {
+		selectedDifficulty,
+		setDifficulty,
+		activePlayerId,
+		initGame,
+		resumeGame,
+		t,
+		showDialog,
+		allowNotes,
+		setAllowNotes,
+		maxMistakes,
+		setMaxMistakes,
+	} = useGameStore();
+
+	const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
+	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const { generatePuzzle } = useSudokuWorker();
+
+	const activePlayer = useLiveQuery(
+		() => (activePlayerId ? db.players.get(activePlayerId) : undefined),
+		[activePlayerId],
+	);
+
+	const savedGame = useLiveQuery(
+		() =>
+			activePlayerId ? db.gameState.where('playerId').equals(activePlayerId).first() : undefined,
+		[activePlayerId],
+	);
+
+	const startNewGameLogic = async () => {
+		setIsLoading(true);
+		try {
+			const { initialGrid, solution } = await generatePuzzle(selectedDifficulty);
+			initGame(initialGrid, solution, selectedDifficulty);
+		} catch (error) {
+			console.error('Failed to generate puzzle:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleStartGame = async () => {
+		if (!activePlayerId) {
+			setIsPlayerMenuOpen(true);
+			return;
+		}
+
+		if (savedGame) {
+			showDialog({
+				title: t('game.paused'),
+				message: 'You have a game in progress. Do you want to resume it or start a new one?',
+				confirmText: 'RESUME',
+				cancelText: 'START NEW (LOST PROGRESS)',
+				onConfirm: () => resumeGame(savedGame),
+				onCancel: startNewGameLogic,
+				type: 'info',
+			});
+			return;
+		}
+
+		await startNewGameLogic();
+	};
+
+	const handleResumeGame = () => {
+		if (savedGame) {
+			resumeGame(savedGame);
+		}
+	};
+
+	const difficulties: Difficulty[] = ['beginner', 'intermediate', 'expert', 'master'];
+
+	return (
+		<motion.div
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			exit={{ opacity: 0 }}
+			className="flex flex-col h-full"
+		>
+			{/* TopAppBar */}
+			<header className="w-full border-b border-border bg-white flex justify-between items-center px-5 h-16 z-10">
+				<button
+					onClick={() => setIsPlayerMenuOpen(true)}
+					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
+				>
+					<User className="w-6 h-6 text-secondary" />
+				</button>
+				<h1 className="font-hanken text-xl font-extrabold tracking-widest-premium text-primary-text uppercase">
+					SUDOKUPADO
+				</h1>
+				<button
+					onClick={() => setIsSettingsOpen(true)}
+					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
+				>
+					<Settings className="w-6 h-6 text-secondary" />
+				</button>
+			</header>
+
+			{/* Main Content Body */}
+			<main className="flex-1 px-5 py-8 flex flex-col gap-8 overflow-y-auto pb-48">
+				{/* Greeting */}
+				<div className="text-center">
+					<p className="font-sans text-lg text-secondary">{t('main_menu.greeting')}</p>
+					<h2 className="font-hanken text-xl font-bold text-primary-text mt-1">
+						{activePlayer?.name || 'Guest'}
+					</h2>
+				</div>
+
+				{/* Resume Game Card */}
+				{savedGame && (
+					<motion.div
+						initial={{ scale: 0.9, opacity: 0 }}
+						animate={{ scale: 1, opacity: 1 }}
+						className="bg-subtle-bg p-4 rounded-DEFAULT border border-border flex items-center justify-between shadow-sm"
+					>
+						<div className="flex flex-col">
+							<span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-wider">
+								Partida Guardada
+							</span>
+							<span className="font-hanken text-sm font-bold text-primary-text uppercase">
+								{t(`main_menu.difficulties.${savedGame.difficulty}`)}
+							</span>
+						</div>
+						<Button variant="primary" size="sm" onClick={handleResumeGame} className="gap-2">
+							<PlayCircle className="w-4 h-4" />
+							{t('game.resume').toUpperCase()}
+						</Button>
+					</motion.div>
+				)}
+
+				{/* Difficulty Selector */}
+				<section className="space-y-4">
+					<h3 className="font-hanken text-xs font-bold text-secondary text-center tracking-widest-premium uppercase">
+						{t('main_menu.difficulty_label')}
+					</h3>
+					<div className="grid grid-cols-2 gap-3">
+						{difficulties.map((diff) => (
+							<button
+								key={diff}
+								disabled={isLoading}
+								onClick={() => setDifficulty(diff)}
+								className={`w-full py-4 px-4 rounded-full font-sans text-base transition-colors border ${
+									selectedDifficulty === diff
+										? 'bg-primary-text text-white border-transparent shadow-sm'
+										: 'bg-white text-primary-text border-border hover:bg-subtle-bg'
+								}`}
+							>
+								{t(`main_menu.difficulties.${diff}`)}
+							</button>
+						))}
+					</div>
+				</section>
+
+				<hr className="border-border" />
+
+				{/* Notes Toggle */}
+				<section className="flex items-center justify-between py-2">
+					<div className="flex items-center gap-3">
+						<Edit2 className="w-5 h-5 text-secondary" />
+						<span className="font-sans text-lg text-primary-text">
+							{t('main_menu.notes_label')}
+						</span>
+					</div>
+					<div
+						onClick={() => setAllowNotes(!allowNotes)}
+						className={`w-14 h-8 rounded-full relative cursor-pointer transition-all flex items-center p-1 ${
+							allowNotes ? 'bg-primary-text' : 'bg-subtle-accent'
+						}`}
+					>
+						<motion.div
+							animate={{ x: allowNotes ? 24 : 0 }}
+							className="w-6 h-6 bg-white rounded-full shadow-sm"
+						/>
+					</div>
+				</section>
+
+				{/* Mistakes Limit */}
+				<section className="space-y-4">
+					<h3 className="font-hanken text-xs font-bold text-secondary text-center tracking-widest-premium uppercase">
+						{t('main_menu.mistakes_label')}
+					</h3>
+					<div className="flex justify-center gap-6">
+						{[0, 3, 5].map((limit) => (
+							<button
+								key={limit}
+								disabled={isLoading}
+								onClick={() => setMaxMistakes(limit)}
+								className={`w-16 h-16 rounded-full font-hanken text-xl flex items-center justify-center transition-all border ${
+									maxMistakes === limit
+										? 'bg-primary-text text-white border-transparent shadow-md'
+										: 'bg-white text-primary-text border-border hover:bg-subtle-bg'
+								}`}
+							>
+								{limit}
+							</button>
+						))}
+					</div>
+				</section>
+			</main>
+
+			{/* Fixed Action Area */}
+			<div className="absolute bottom-16 w-full p-5 bg-white border-t border-border z-20">
+				<Button
+					variant="primary"
+					size="xl"
+					className="w-full uppercase shadow-lg"
+					disabled={isLoading}
+					onClick={handleStartGame}
+				>
+					{isLoading ? (
+						<div className="flex items-center justify-center gap-3">
+							<Loader2 className="w-6 h-6 animate-spin" />
+							<span className="text-sm tracking-widest-premium">
+								{t('main_menu.generating_label')}
+							</span>
+						</div>
+					) : activePlayerId ? (
+						t('main_menu.play_button')
+					) : (
+						t('main_menu.select_player')
+					)}
+				</Button>
+			</div>
+
+			<PlayerMenu isOpen={isPlayerMenuOpen} onClose={() => setIsPlayerMenuOpen(false)} />
+
+			<SettingsMenu isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+		</motion.div>
+	);
+};
+
+export default MainMenuScreen;

@@ -1,0 +1,17 @@
+# GEMINI.md - Behavior Rules
+
+This document outlines the strict behavioral rules for Gemini CLI during the development of SUDOKUPADO.
+
+## Rules
+
+1.  **Regression Testing Mandatory:** For every bug reported by the user, a corresponding regression test MUST be created in the `src/test/` directory. This test must specifically reproduce the reported failure and verify its fix to prevent future regressions.
+2.  **English Technical Artifacts:** All source code, variable names, functions, interfaces, inline comments, documentation, and tests MUST be written strictly in English.
+3.  **Castilian Spanish Communication:** All conversational interactions and explanations with the user MUST be in Castilian Spanish.
+4.  **Design System Adherence:** All UI changes MUST strictly follow the rules defined in `DESIGN.md`.
+5.  **Versioning (SemVer):** The project uses Semantic Versioning for Git tags.
+    *   **MAJOR:** Backward-incompatible, drastic changes.
+    *   **MINOR:** New features that are backward-compatible.
+    *   **PATCH:** Bug fixes that are backward-compatible.
+6.  **Version Tagging Condition:** ONLY create a new version tag (e.g., `v1.0.0`) when there are real, functional changes to the game (e.g., source code). Changes exclusively to meta-files, documentation, or tools like `GEMINI.md` DO NOT warrant a new version tag.
+7.  **Version Tagging Authorization:** NEVER create a version tag without PRIOR EXPLICIT CONFIRMATION from the user, as this action triggers the automatic deployment to github.io via CI.
+8.  **Pre-Tagging Workflow:** Before creating a version tag, all changes MUST be committed using the Conventional Commits standard.
