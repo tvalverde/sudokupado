@@ -13,7 +13,7 @@ This document outlines the strict behavioral rules for Gemini CLI during the dev
     *   **MINOR:** New features that are backward-compatible.
     *   **PATCH:** Bug fixes that are backward-compatible.
 6.  **Version Tagging Condition:** ONLY create a new version tag (e.g., `v1.0.0`) when there are real, functional changes to the game (e.g., source code). Changes exclusively to meta-files, documentation, or tools like `GEMINI.md` DO NOT warrant a new version tag.
-7.  **Version Tagging Authorization:** NEVER create a version tag without PRIOR EXPLICIT CONFIRMATION from the user, as this action triggers the automatic deployment to github.io via CI.
+7.  **Version Tagging Authorization:** NEVER create a version tag without PRIOR EXPLICIT CONFIRMATION from the user. Once confirmed, the authorization IMPLICITLY includes permission to push both the `main` branch and the new tag to the remote repository to trigger deployment.
 8.  **Pre-Tagging Workflow:** Before creating a version tag, all changes MUST be committed using the Conventional Commits standard.
 9.  **Version Bumping Rule:** When updating the project version, ALWAYS use the `npm version <type> --no-git-tag-version` (or specify the exact version) command. This ensures both `package.json` and `package-lock.json` are synchronized. DO NOT update `package.json` manually. BEFORE bumping the version, you MUST run locally `make check` to ensure no broken code is tagged.
 10. **Backlog & Technical Debt:** ANY pending feature, non-critical bug, or technical debt MUST be recorded in the `TODO.md` file (ignored by Git) to keep the conversational context and the project guidelines clean.
