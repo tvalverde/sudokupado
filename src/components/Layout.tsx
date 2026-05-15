@@ -6,8 +6,14 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
-		<div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-0 sm:p-4">
-			<div className="max-w-container w-full bg-white min-h-screen sm:min-h-[850px] relative shadow-2xl flex flex-col overflow-hidden">
+		<div className="h-[100dvh] bg-[#f1f5f9] flex items-center justify-center p-0 md:p-6 overflow-hidden">
+			{/* 
+				Adaptive Container:
+				- Mobile: Full width/height, no radius.
+				- Tablet (md): Grow up to 700px, full height or slightly less to avoid scroll.
+				- Desktop (lg): Fixed phone-like frame.
+			*/}
+			<div className="w-full h-full md:max-w-[700px] lg:max-w-[448px] md:h-full lg:h-[min(90dvh,900px)] bg-white relative md:shadow-2xl flex flex-col overflow-hidden md:rounded-[2rem] md:border md:border-border">
 				{children}
 			</div>
 		</div>

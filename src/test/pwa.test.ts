@@ -13,17 +13,18 @@ vi.mock('virtual:pwa-register/react', () => ({
 }));
 
 describe('Regression: PWA Toast Mobile Layout', () => {
-	it('should render with centered absolute positioning', () => {
+	it('should render with responsive absolute positioning', () => {
 		render(React.createElement(ReloadPrompt));
 
-		// Check the motion.div wrapper (it has left-1/2 class)
+		// Check the motion.div wrapper (it has absolute class)
 		const container = screen
 			.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i)
 			.closest('div[class*="absolute"]');
 
 		expect(container).not.toBeNull();
 		expect(container?.className).toContain('absolute');
-		expect(container?.className).toContain('left-1/2');
+		expect(container?.className).toContain('left-4');
+		expect(container?.className).toContain('right-4');
 	});
 
 	it('should be positioned above BottomNavBar', () => {

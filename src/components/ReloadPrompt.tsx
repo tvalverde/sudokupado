@@ -27,10 +27,10 @@ function ReloadPrompt() {
 		<AnimatePresence>
 			{(offlineReady || needRefresh) && (
 				<motion.div
-					initial={{ y: 100, x: '-50%', opacity: 0 }}
-					animate={{ y: 0, x: '-50%', opacity: 1 }}
-					exit={{ y: 100, x: '-50%', opacity: 0 }}
-					className="absolute bottom-20 left-1/2 z-[100] w-[calc(100%-32px)] max-w-[400px]"
+					initial={{ y: 100, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					exit={{ y: 100, opacity: 0 }}
+					className="absolute bottom-20 left-4 right-4 z-[100] mx-auto max-w-[400px]"
 				>
 					<div className="bg-primary-text text-white p-4 rounded-2xl shadow-2xl flex flex-col items-center justify-between gap-4 border border-white/10 overflow-hidden">
 						<div className="flex flex-col gap-1 flex-1 text-center w-full">
