@@ -20,14 +20,13 @@ vi.mock('../hooks/useSudokuWorker', () => ({
 }));
 
 describe('UI Components', () => {
-	it('should show SELECT PLAYER button when no player is active', () => {
+	it('should show Play as Guest button when no player is active', () => {
 		useGameStore.setState({ activePlayerId: null });
 		render(React.createElement(MainMenuScreen));
 
-		const button = screen.getByRole('button', { name: /SELECT PLAYER|SELECCIONAR JUGADOR/i });
+		const button = screen.getByRole('button', { name: /Play as Guest|Jugar como Invitado/i });
 		expect(button).toBeDefined();
 	});
-
 	it('should change button to PLAY when a player is active', () => {
 		useGameStore.setState({ activePlayerId: 1 });
 		render(React.createElement(MainMenuScreen));

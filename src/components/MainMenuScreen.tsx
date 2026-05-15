@@ -55,11 +55,6 @@ const MainMenuScreen: React.FC = () => {
 	};
 
 	const handleStartGame = async () => {
-		if (!activePlayerId) {
-			setIsPlayerMenuOpen(true);
-			return;
-		}
-
 		if (savedGame) {
 			showDialog({
 				title: t('game.paused'),
@@ -248,7 +243,7 @@ const MainMenuScreen: React.FC = () => {
 					) : activePlayerId ? (
 						t('main_menu.play_button')
 					) : (
-						t('main_menu.select_player')
+						t('main_menu.play_guest')
 					)}
 				</Button>
 			</div>

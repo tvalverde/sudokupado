@@ -9,6 +9,7 @@ export const translations = {
 			mistakes_label: 'Allowed Mistakes',
 			play_button: 'Play',
 			select_player: 'Select Player',
+			play_guest: 'Play as Guest',
 			generating_label: 'Generating Puzzle...',
 			resume_prompt_msg:
 				'You have a game in progress. Do you want to resume it or start a new one?',
@@ -137,6 +138,7 @@ export const translations = {
 			mistakes_label: 'Fallos Permitidos',
 			play_button: 'Jugar',
 			select_player: 'Seleccionar Jugador',
+			play_guest: 'Jugar como Invitado',
 			generating_label: 'Generando puzzle...',
 			resume_prompt_msg: 'Tienes una partida en curso. ¿Deseas continuarla o empezar una nueva?',
 			resume_prompt_confirm: 'REANUDAR',
