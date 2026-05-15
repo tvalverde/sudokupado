@@ -98,6 +98,14 @@ export const translations = {
 			button: 'INSTALL NOW',
 			later: 'Not now',
 		},
+		pwa: {
+			ready: 'App Ready Offline',
+			ready_msg: 'Sudokupado is ready to be played without internet.',
+			new_version: 'New Version Available',
+			new_version_msg: 'A new update is available for a better experience.',
+			update: 'Update',
+			close: 'Close',
+		},
 	},
 	es: {
 		main_menu: {
@@ -197,6 +205,14 @@ export const translations = {
 				'¡Has logrado tu primera victoria! Instala la aplicación para una mejor experiencia a pantalla completa y offline.',
 			button: 'INSTALAR AHORA',
 			later: 'Ahora no',
+		},
+		pwa: {
+			ready: 'App lista offline',
+			ready_msg: 'SUDOKUPADO ya puede jugarse sin conexión a internet.',
+			new_version: 'Nueva versión disponible',
+			new_version_msg: 'Hay una actualización disponible para mejorar tu experiencia.',
+			update: 'Actualizar',
+			close: 'Cerrar',
 		},
 	},
 };
