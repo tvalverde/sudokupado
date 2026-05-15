@@ -1,6 +1,6 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { RefreshCw } from 'lucide-react';
+import { Check, RefreshCw } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 
 function ReloadPrompt() {
@@ -42,7 +42,7 @@ function ReloadPrompt() {
 							</p>
 						</div>
 						<div className="flex gap-2 shrink-0 w-full">
-							{needRefresh && (
+							{needRefresh ? (
 								<button
 									type="button"
 									onClick={() => updateServiceWorker(true)}
@@ -51,14 +51,16 @@ function ReloadPrompt() {
 									<RefreshCw className="w-3 h-3" />
 									{t('pwa.update')}
 								</button>
+							) : (
+								<button
+									type="button"
+									onClick={() => close()}
+									className="bg-white text-primary-text px-4 py-2 rounded-full font-hanken text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 flex-1 shadow-sm active:scale-95 transition-transform"
+								>
+									<Check className="w-3 h-3" />
+									{t('pwa.close').toUpperCase()}
+								</button>
 							)}
-							<button
-								type="button"
-								onClick={() => close()}
-								className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-hanken text-[10px] font-black uppercase tracking-wider flex-1 active:scale-95 transition-all"
-							>
-								{t('pwa.close')}
-							</button>
 						</div>
 					</div>
 				</motion.div>
