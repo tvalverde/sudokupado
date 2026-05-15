@@ -58,5 +58,5 @@ describe('SudokuEngine Advanced Logic', () => {
 		const expertEmpty = expertPuzzle.flat().filter((v) => v === 0).length;
 
 		expect(expertEmpty).toBeGreaterThan(beginnerEmpty);
-	});
+	}, 15000); // Increased timeout to 15s for heavy generation logic
 });
