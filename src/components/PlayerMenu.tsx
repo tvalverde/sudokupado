@@ -116,6 +116,27 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 									{t('player_menu.switch_player')}
 								</span>
 								<div className="flex flex-col gap-2">
+									{/* Guest (Anonymous) Option */}
+									{activePlayerId !== null && (
+										<button
+											type="button"
+											onClick={() => {
+												setActivePlayer(null);
+												onClose();
+											}}
+											className="bg-subtle-bg border border-border rounded-DEFAULT p-3 flex items-center justify-between hover:bg-slate-200 transition-colors cursor-pointer group w-full text-left"
+										>
+											<div className="flex items-center gap-3">
+												<div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary">
+													<User className="w-6 h-6" />
+												</div>
+												<span className="font-sans text-base text-primary-text font-medium">
+													{t('main_menu.guest')}
+												</span>
+											</div>
+										</button>
+									)}
+
 									{otherPlayers?.map((player) => (
 										<button
 											key={player.id}

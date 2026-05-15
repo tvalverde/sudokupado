@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { LayoutGrid, Play, PlayCircle, Settings, User } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../db/database';
 import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
@@ -15,6 +15,7 @@ const MainMenuScreen: React.FC = () => {
 		selectedDifficulty,
 		setDifficulty,
 		activePlayerId,
+		setActivePlayer,
 		initGame,
 		resumeGame,
 		t,
@@ -30,6 +31,19 @@ const MainMenuScreen: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const { generatePuzzle } = useSudokuWorker();
+
+	// Session Integrity Validator: Ensure the activePlayerId still exists in DB
+	useEffect(() => {
+		if (activePlayerId !== null) {
+			db.players.get(activePlayerId).then((player) => {
+				if (!player || player.isDeleted === 1) {
+					// Player was deleted or database was cleared.
+					// Reset the session to Guest.
+					setActivePlayer(null);
+				}
+			});
+		}
+	}, [activePlayerId, setActivePlayer]);
 
 	const activePlayer = useLiveQuery(
 		() => (activePlayerId ? db.players.get(activePlayerId) : undefined),

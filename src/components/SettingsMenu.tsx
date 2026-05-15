@@ -68,6 +68,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 						await db.gameState.clear();
 					},
 				);
+				await setActivePlayer(null); // Clear local state immediately
 				showStatus('success', t('settings.reset_success'));
 				setTimeout(() => window.location.reload(), 1500);
 			},
