@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { LayoutGrid, PlayCircle, Settings, User } from 'lucide-react';
+import { LayoutGrid, Play, PlayCircle, Settings, User } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { db } from '../db/database';
@@ -242,12 +242,12 @@ const MainMenuScreen: React.FC = () => {
 						</div>
 					) : activePlayerId ? (
 						<div className="flex items-center justify-center gap-3">
-							<PlayCircle className="w-6 h-6 fill-current" />
+							<Play className="w-6 h-6 fill-current" />
 							<span>{t('main_menu.play_button').toUpperCase()}</span>
 						</div>
 					) : (
 						<div className="flex items-center justify-center gap-3">
-							<PlayCircle className="w-6 h-6 fill-current" />
+							<Play className="w-6 h-6 fill-current" />
 							<span>{t('main_menu.play_guest').toUpperCase()}</span>
 						</div>
 					)}
