@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Eraser, Lightbulb, Pause, Pencil, Play, RotateCcw, Trophy } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { db } from '../db/database';
 import { useGameStore } from '../store/gameStore';
 import SudokuBoard from './SudokuBoard';
@@ -20,6 +20,7 @@ const GameScreen: React.FC = () => {
 		hintsUsed,
 		useHint,
 		selectedCell,
+		setSelectedCell,
 		setCellValue,
 		toggleNote,
 		activePlayerId,
@@ -83,7 +84,7 @@ const GameScreen: React.FC = () => {
 		return () => clearInterval(timer);
 	}, [isPaused, incrementTime, isVictory]);
 
-	const calculateScore = () => {
+	const calculateScore = useCallback(() => {
 		const baseScores = { beginner: 2000, intermediate: 4000, expert: 6000, master: 8000 };
 		const base = baseScores[selectedDifficulty] || 2000;
 
@@ -97,50 +98,121 @@ const GameScreen: React.FC = () => {
 
 		const score = base - timeElapsed - mistakes * 200 - hintPenalty;
 		return Math.max(0, score);
-	};
+	}, [selectedDifficulty, hintsUsed, timeElapsed, mistakes]);
 
-	const handleNumberInput = async (num: number) => {
-		if (isPaused || isVictory || !selectedCell) return;
-		const { r, c } = selectedCell;
+	const handleNumberInput = useCallback(
+		async (num: number) => {
+			if (isPaused || isVictory || !selectedCell) return;
+			const { r, c } = selectedCell;
 
-		if (isNoteMode) {
-			toggleNote(r, c, num);
-		} else {
-			const { isCorrect, isFinished } = setCellValue(r, c, num);
+			if (isNoteMode) {
+				toggleNote(r, c, num);
+			} else {
+				const { isCorrect, isFinished } = setCellValue(r, c, num);
 
-			if (!isCorrect) {
-				if (navigator.vibrate) navigator.vibrate(200);
-			}
-
-			if (isFinished) {
-				const finalScore = calculateScore();
-				const result = {
-					score: finalScore,
-					timeElapsed,
-					difficulty: selectedDifficulty,
-					mistakes,
-				};
-
-				if (activePlayerId) {
-					await db.history.add({
-						playerId: activePlayerId,
-						difficulty: selectedDifficulty,
-						score: finalScore,
-						timeElapsed,
-						date: Date.now(),
-					});
-					const existing = await db.gameState.where('playerId').equals(activePlayerId).first();
-					if (existing?.id) await db.gameState.delete(existing.id);
+				if (!isCorrect) {
+					if (navigator.vibrate) navigator.vibrate(200);
 				}
 
-				setLastGameResult(result);
+				if (isFinished) {
+					const finalScore = calculateScore();
+					const result = {
+						score: finalScore,
+						timeElapsed,
+						difficulty: selectedDifficulty,
+						mistakes,
+					};
 
-				setTimeout(() => {
-					setScreen('result');
-				}, 3000);
+					if (activePlayerId) {
+						await db.history.add({
+							playerId: activePlayerId,
+							difficulty: selectedDifficulty,
+							score: finalScore,
+							timeElapsed,
+							date: Date.now(),
+						});
+						const existing = await db.gameState.where('playerId').equals(activePlayerId).first();
+						if (existing?.id) await db.gameState.delete(existing.id);
+					}
+
+					setLastGameResult(result);
+
+					setTimeout(() => {
+						setScreen('result');
+					}, 3000);
+				}
 			}
-		}
-	};
+		},
+		[
+			isPaused,
+			isVictory,
+			selectedCell,
+			isNoteMode,
+			toggleNote,
+			setCellValue,
+			calculateScore,
+			timeElapsed,
+			selectedDifficulty,
+			mistakes,
+			activePlayerId,
+			setLastGameResult,
+			setScreen,
+		],
+	);
+
+	// Keyboard Navigation and Shortcuts
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (isPaused || isVictory) return;
+
+			// Arrow Navigation
+			if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+				e.preventDefault();
+				if (!selectedCell) {
+					setSelectedCell(4, 4);
+					return;
+				}
+
+				let { r, c } = selectedCell;
+				if (e.key === 'ArrowUp') r = Math.max(0, r - 1);
+				if (e.key === 'ArrowDown') r = Math.min(8, r + 1);
+				if (e.key === 'ArrowLeft') c = Math.max(0, c - 1);
+				if (e.key === 'ArrowRight') c = Math.min(8, c + 1);
+
+				if (r !== selectedCell.r || c !== selectedCell.c) {
+					setSelectedCell(r, c);
+				}
+				return;
+			}
+
+			// Number Input (1-9)
+			if (/^[1-9]$/.test(e.key)) {
+				e.preventDefault();
+				handleNumberInput(Number.parseInt(e.key, 10));
+				return;
+			}
+
+			// Toggle Note Mode (N or Space)
+			if (e.key.toLowerCase() === 'n' || e.key === ' ') {
+				e.preventDefault();
+				setNoteMode(!isNoteMode);
+				return;
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [
+		isPaused,
+		isVictory,
+		selectedCell,
+		isNoteMode,
+		setSelectedCell,
+		setNoteMode,
+		handleNumberInput,
+	]);
 
 	const formatTime = (seconds: number) => {
 		const mins = Math.floor(seconds / 60);

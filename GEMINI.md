@@ -17,3 +17,5 @@ This document outlines the strict behavioral rules for Gemini CLI during the dev
 8.  **Pre-Tagging Workflow:** Before creating a version tag, all changes MUST be committed using the Conventional Commits standard.
 9.  **Version Bumping Rule:** When updating the project version, ALWAYS use the `npm version <type> --no-git-tag-version` (or specify the exact version) command. This ensures both `package.json` and `package-lock.json` are synchronized. DO NOT update `package.json` manually. BEFORE bumping the version, you MUST run locally `make check` to ensure no broken code is tagged.
 10. **Backlog & Technical Debt:** ANY pending feature, non-critical bug, or technical debt MUST be recorded in the `TODO.md` file (ignored by Git) to keep the conversational context and the project guidelines clean.
+11. **User Consultation Options:** When using the `ask_user` tool with the `choice` type, ALWAYS provide at least 3 distinct options. Additionally, ALWAYS explicitly state which option is recommended and provide a brief technical justification for that recommendation.
+
