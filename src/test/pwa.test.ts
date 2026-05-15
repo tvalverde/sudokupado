@@ -28,7 +28,7 @@ describe('Regression: PWA Toast Mobile Layout', () => {
 
 	it('should be positioned above BottomNavBar', () => {
 		render(React.createElement(ReloadPrompt));
-		const motionDiv = screen
+		const _motionDiv = screen
 			.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i)
 			.closest('div[style*="opacity"]');
 		// We can check if it has the fixed and bottom classes

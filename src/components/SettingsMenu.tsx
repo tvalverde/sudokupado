@@ -36,8 +36,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 
 		showDialog({
 			title: t('settings.data_management'),
-			message:
-				'Importing a backup will overwrite all current players and history. Do you want to proceed?',
+			message: t('settings.import_prompt_msg'),
 			onConfirm: async () => {
 				try {
 					await importDatabaseFromJson(file);
@@ -47,7 +46,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 					showStatus('error', 'Import failed: Invalid file');
 				}
 			},
-			confirmText: 'IMPORT & RELOAD',
+			confirmText: t('settings.import_prompt_confirm'),
 			type: 'danger',
 		});
 
@@ -72,7 +71,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 				showStatus('success', t('settings.reset_success'));
 				setTimeout(() => window.location.reload(), 1500);
 			},
-			confirmText: 'DELETE EVERYTHING',
+			confirmText: t('settings.delete_all_confirm'),
 			type: 'danger',
 		});
 	};
@@ -105,6 +104,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 								{t('settings.title')}
 							</h2>
 							<button
+								type="button"
 								onClick={onClose}
 								className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 							>
@@ -143,6 +143,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 								<div className="flex gap-2">
 									{(['en', 'es'] as Language[]).map((lang) => (
 										<button
+											type="button"
 											key={lang}
 											onClick={() => setLanguage(lang)}
 											className={`flex-1 py-3 rounded-full font-hanken text-xs font-bold uppercase transition-all border ${

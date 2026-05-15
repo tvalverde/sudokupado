@@ -33,15 +33,15 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 
 	const handleDeletePlayer = async (id: number, name: string) => {
 		showDialog({
-			title: 'Delete Player',
-			message: `Are you sure you want to delete ${name}? All trophy history for this player will be hidden.`,
+			title: t('player_menu.delete_prompt_title'),
+			message: t('player_menu.delete_prompt_msg').replace('{name}', name),
 			onConfirm: async () => {
 				await db.players.update(id, { isDeleted: 1 });
 				if (activePlayerId === id) {
 					setActivePlayer(null);
 				}
 			},
-			confirmText: 'DELETE PLAYER',
+			confirmText: t('player_menu.delete_prompt_confirm'),
 			type: 'danger',
 		});
 	};
@@ -72,6 +72,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 								{t('player_menu.title')}
 							</h2>
 							<button
+								type="button"
 								onClick={onClose}
 								className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 							>
@@ -87,9 +88,10 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 									{t('player_menu.active_player')}
 								</span>
 								{activePlayer ? (
-									<div
+									<button
+										type="button"
 										onClick={onClose} // Closing if clicking current active is also a good QoL
-										className="bg-primary-text text-white rounded-DEFAULT p-4 flex items-center justify-between shadow-sm cursor-pointer"
+										className="bg-primary-text text-white rounded-DEFAULT p-4 flex items-center justify-between shadow-sm cursor-pointer w-full text-left"
 									>
 										<div className="flex items-center gap-3">
 											<div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -98,7 +100,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 											<span className="font-hanken text-lg font-bold">{activePlayer.name}</span>
 										</div>
 										<CheckCircle className="w-6 h-6 text-white" />
-									</div>
+									</button>
 								) : (
 									<div className="p-4 border-2 border-dashed border-border rounded-DEFAULT text-center text-secondary font-sans text-sm">
 										{t('player_menu.no_active')}
@@ -115,13 +117,14 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 								</span>
 								<div className="flex flex-col gap-2">
 									{otherPlayers?.map((player) => (
-										<div
+										<button
 											key={player.id}
+											type="button"
 											onClick={() => {
 												setActivePlayer(player.id!);
 												onClose(); // Auto-close on selection
 											}}
-											className="bg-subtle-bg border border-border rounded-DEFAULT p-3 flex items-center justify-between hover:bg-slate-200 transition-colors cursor-pointer group"
+											className="bg-subtle-bg border border-border rounded-DEFAULT p-3 flex items-center justify-between hover:bg-slate-200 transition-colors cursor-pointer group w-full text-left"
 										>
 											<div className="flex items-center gap-3">
 												<div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary">
@@ -132,15 +135,16 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 												</span>
 											</div>
 											<button
+												type="button"
 												onClick={(e) => {
 													e.stopPropagation();
 													handleDeletePlayer(player.id!, player.name);
 												}}
-												className="p-2 hover:bg-error-container hover:text-error rounded-full transition-colors text-secondary"
+												className="p-2 hover:bg-red-100 hover:text-error rounded-full transition-colors text-secondary"
 											>
 												<Trash2 className="w-5 h-5" />
 											</button>
-										</div>
+										</button>
 									))}
 								</div>
 							</div>
@@ -181,6 +185,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 						{!isCreating && (
 							<div className="p-4 border-t border-subtle-bg bg-subtle-bg">
 								<button
+									type="button"
 									onClick={() => setIsCreating(true)}
 									className="w-full bg-primary-text text-white rounded-full py-4 px-6 flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors active:scale-95 shadow-sm"
 								>

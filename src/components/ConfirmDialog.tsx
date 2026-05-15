@@ -79,6 +79,7 @@ const ConfirmDialog: React.FC = () => {
 						</div>
 
 						<button
+							type="button"
 							onClick={handleCancel}
 							className="absolute top-2 right-2 p-1 text-secondary/50 hover:text-primary-text transition-colors"
 						>

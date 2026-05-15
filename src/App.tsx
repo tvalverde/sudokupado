@@ -16,7 +16,7 @@ const ResultScreen = lazy(() => import('./components/ResultScreen'));
 const RulesScreen = lazy(() => import('./components/RulesScreen'));
 
 function App() {
-	const { activeScreen } = useGameStore();
+	const { activeScreen, t } = useGameStore();
 
 	useAutoSave();
 
@@ -44,7 +44,7 @@ function App() {
 			<Suspense
 				fallback={
 					<div className="flex items-center justify-center h-full font-hanken uppercase tracking-widest-premium text-xs text-secondary animate-pulse">
-						Loading...
+						{t('pwa.loading')}
 					</div>
 				}
 			>

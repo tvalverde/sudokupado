@@ -2,12 +2,18 @@ export const translations = {
 	en: {
 		main_menu: {
 			greeting: 'Hello,',
+			guest: 'Guest',
+			saved_game: 'Saved Game',
 			difficulty_label: 'Difficulty Level',
 			notes_label: 'Notes (Pencil)',
 			mistakes_label: 'Allowed Mistakes',
 			play_button: 'Play',
 			select_player: 'Select Player',
 			generating_label: 'Generating Puzzle...',
+			resume_prompt_msg:
+				'You have a game in progress. Do you want to resume it or start a new one?',
+			resume_prompt_confirm: 'RESUME',
+			resume_prompt_cancel: 'START NEW (LOST PROGRESS)',
 			difficulties: {
 				beginner: 'Beginner',
 				intermediate: 'Intermediate',
@@ -31,6 +37,11 @@ export const translations = {
 			paused: 'Game Paused',
 			resume: 'Tap to resume',
 			victory: 'VICTORY!',
+			restart_prompt_title: 'Restart Puzzle',
+			restart_prompt_msg:
+				'Are you sure you want to clear your progress and start this puzzle over?',
+			restart_prompt_confirm: 'RESTART',
+			restart_prompt_cancel: 'CONTINUE PLAYING',
 		},
 		player_menu: {
 			title: 'PLAYER MENU',
@@ -42,6 +53,10 @@ export const translations = {
 			create: 'Create',
 			cancel: 'Cancel',
 			delete_confirm: 'Are you sure you want to delete this player?',
+			delete_prompt_title: 'Delete Player',
+			delete_prompt_msg:
+				'Are you sure you want to delete {name}? All trophy history for this player will be hidden.',
+			delete_prompt_confirm: 'DELETE PLAYER',
 		},
 		settings: {
 			title: 'SETTINGS',
@@ -57,6 +72,10 @@ export const translations = {
 			import_success: 'Data imported. The app will reload.',
 			clear_confirm: 'CRITICAL: This will delete ALL players and history. Continue?',
 			reset_success: 'All data cleared. Reloading...',
+			import_prompt_msg:
+				'Importing a backup will overwrite all current players and history. Do you want to proceed?',
+			import_prompt_confirm: 'IMPORT & RELOAD',
+			delete_all_confirm: 'DELETE EVERYTHING',
 		},
 		trophies: {
 			title: 'TROPHY HISTORY',
@@ -105,17 +124,23 @@ export const translations = {
 			new_version_msg: 'A new update is available for a better experience.',
 			update: 'Update',
 			close: 'Close',
+			loading: 'Loading...',
 		},
 	},
 	es: {
 		main_menu: {
 			greeting: 'Hola,',
+			guest: 'Invitado',
+			saved_game: 'Partida guardada',
 			difficulty_label: 'Nivel de Dificultad',
 			notes_label: 'Anotaciones (Lápiz)',
 			mistakes_label: 'Fallos Permitidos',
 			play_button: 'Jugar',
 			select_player: 'Seleccionar Jugador',
 			generating_label: 'Generando puzzle...',
+			resume_prompt_msg: 'Tienes una partida en curso. ¿Deseas continuarla o empezar una nueva?',
+			resume_prompt_confirm: 'REANUDAR',
+			resume_prompt_cancel: 'NUEVA (BORRAR PROGRESO)',
 			difficulties: {
 				beginner: 'Principiante',
 				intermediate: 'Iniciado',
@@ -139,6 +164,11 @@ export const translations = {
 			paused: 'Partida Pausada',
 			resume: 'Toca para continuar',
 			victory: '¡VICTORIA!',
+			restart_prompt_title: 'Reiniciar Sudoku',
+			restart_prompt_msg:
+				'¿Estás seguro de que deseas borrar tu progreso y empezar este Sudoku desde cero?',
+			restart_prompt_confirm: 'REINICIAR',
+			restart_prompt_cancel: 'CONTINUAR JUGANDO',
 		},
 		player_menu: {
 			title: 'MENÚ DE JUGADORES',
@@ -150,6 +180,10 @@ export const translations = {
 			create: 'Crear',
 			cancel: 'Cancelar',
 			delete_confirm: '¿Estás seguro de que deseas eliminar este jugador?',
+			delete_prompt_title: 'Eliminar Jugador',
+			delete_prompt_msg:
+				'¿Estás seguro de que deseas eliminar a {name}? Todo su historial de trofeos quedará oculto.',
+			delete_prompt_confirm: 'ELIMINAR JUGADOR',
 		},
 		settings: {
 			title: 'AJUSTES',
@@ -165,6 +199,10 @@ export const translations = {
 			import_success: 'Datos importados. La app se reiniciará.',
 			clear_confirm: 'CRÍTICO: Se borrarán TODOS los jugadores e historial. ¿Continuar?',
 			reset_success: 'Datos borrados. Reiniciando...',
+			import_prompt_msg:
+				'Importar una copia de seguridad sobrescribirá todos los jugadores e historial actuales. ¿Deseas continuar?',
+			import_prompt_confirm: 'IMPORTAR Y RECARGAR',
+			delete_all_confirm: 'BORRAR TODO',
 		},
 		trophies: {
 			title: 'TROFEOS',
@@ -213,6 +251,7 @@ export const translations = {
 			new_version_msg: 'Hay una actualización disponible para mejorar tu experiencia.',
 			update: 'Actualizar',
 			close: 'Cerrar',
+			loading: 'Cargando...',
 		},
 	},
 };

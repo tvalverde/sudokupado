@@ -1,6 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { motion } from 'framer-motion';
-import { Edit2, Loader2, PlayCircle, Settings, User } from 'lucide-react';
+import { LayoutGrid, PlayCircle, Settings, User } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import { db } from '../db/database';
@@ -64,9 +63,9 @@ const MainMenuScreen: React.FC = () => {
 		if (savedGame) {
 			showDialog({
 				title: t('game.paused'),
-				message: 'You have a game in progress. Do you want to resume it or start a new one?',
-				confirmText: 'RESUME',
-				cancelText: 'START NEW (LOST PROGRESS)',
+				message: t('main_menu.resume_prompt_msg'),
+				confirmText: t('main_menu.resume_prompt_confirm'),
+				cancelText: t('main_menu.resume_prompt_cancel'),
 				onConfirm: () => resumeGame(savedGame),
 				onCancel: startNewGameLogic,
 				type: 'info',
@@ -86,15 +85,11 @@ const MainMenuScreen: React.FC = () => {
 	const difficulties: Difficulty[] = ['beginner', 'intermediate', 'expert', 'master'];
 
 	return (
-		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
-			exit={{ opacity: 0 }}
-			className="flex flex-col h-full"
-		>
+		<div className="flex flex-col h-full">
 			{/* TopAppBar */}
 			<header className="w-full border-b border-border bg-white flex justify-between items-center px-5 h-16 z-10">
 				<button
+					type="button"
 					onClick={() => setIsPlayerMenuOpen(true)}
 					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 				>
@@ -104,6 +99,7 @@ const MainMenuScreen: React.FC = () => {
 					SUDOKUPADO
 				</h1>
 				<button
+					type="button"
 					onClick={() => setIsSettingsOpen(true)}
 					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 				>
@@ -117,20 +113,16 @@ const MainMenuScreen: React.FC = () => {
 				<div className="text-center">
 					<p className="font-sans text-lg text-secondary">{t('main_menu.greeting')}</p>
 					<h2 className="font-hanken text-xl font-bold text-primary-text mt-1">
-						{activePlayer?.name || 'Guest'}
+						{activePlayer?.name || t('main_menu.guest')}
 					</h2>
 				</div>
 
 				{/* Resume Game Card */}
 				{savedGame && (
-					<motion.div
-						initial={{ scale: 0.9, opacity: 0 }}
-						animate={{ scale: 1, opacity: 1 }}
-						className="bg-subtle-bg p-4 rounded-DEFAULT border border-border flex items-center justify-between shadow-sm"
-					>
+					<div className="bg-subtle-bg p-4 rounded-DEFAULT border border-border flex items-center justify-between shadow-sm">
 						<div className="flex flex-col">
 							<span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-wider">
-								Partida Guardada
+								{t('main_menu.saved_game')}
 							</span>
 							<span className="font-hanken text-sm font-bold text-primary-text uppercase">
 								{t(`main_menu.difficulties.${savedGame.difficulty}`)}
@@ -140,7 +132,7 @@ const MainMenuScreen: React.FC = () => {
 							<PlayCircle className="w-4 h-4" />
 							{t('game.resume').toUpperCase()}
 						</Button>
-					</motion.div>
+					</div>
 				)}
 
 				{/* Difficulty Selector */}
@@ -151,6 +143,7 @@ const MainMenuScreen: React.FC = () => {
 					<div className="grid grid-cols-2 gap-3">
 						{difficulties.map((diff) => (
 							<button
+								type="button"
 								key={diff}
 								disabled={isLoading}
 								onClick={() => setDifficulty(diff)}
@@ -171,22 +164,22 @@ const MainMenuScreen: React.FC = () => {
 				{/* Notes Toggle */}
 				<section className="flex items-center justify-between py-2">
 					<div className="flex items-center gap-3">
-						<Edit2 className="w-5 h-5 text-secondary" />
+						<LayoutGrid className="w-5 h-5 text-secondary" />
 						<span className="font-sans text-lg text-primary-text">
 							{t('main_menu.notes_label')}
 						</span>
 					</div>
-					<div
+					<button
+						type="button"
 						onClick={() => setAllowNotes(!allowNotes)}
 						className={`w-14 h-8 rounded-full relative cursor-pointer transition-all flex items-center p-1 ${
 							allowNotes ? 'bg-primary-text' : 'bg-subtle-accent'
 						}`}
 					>
-						<motion.div
-							animate={{ x: allowNotes ? 24 : 0 }}
-							className="w-6 h-6 bg-white rounded-full shadow-sm"
+						<div
+							className={`w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-200 ${allowNotes ? 'translate-x-6' : 'translate-x-0'}`}
 						/>
-					</div>
+					</button>
 				</section>
 
 				{/* Mistakes Limit */}
@@ -197,6 +190,7 @@ const MainMenuScreen: React.FC = () => {
 					<div className="flex justify-center gap-6">
 						{[0, 3, 5].map((limit) => (
 							<button
+								type="button"
 								key={limit}
 								disabled={isLoading}
 								onClick={() => setMaxMistakes(limit)}
@@ -213,7 +207,7 @@ const MainMenuScreen: React.FC = () => {
 				</section>
 			</main>
 
-			{/* Fixed Action Area */}
+			{/* Fixed Action Area - Positioned above BottomNavBar */}
 			<div className="absolute bottom-16 w-full p-5 bg-white border-t border-border z-20">
 				<Button
 					variant="primary"
@@ -224,7 +218,29 @@ const MainMenuScreen: React.FC = () => {
 				>
 					{isLoading ? (
 						<div className="flex items-center justify-center gap-3">
-							<Loader2 className="w-6 h-6 animate-spin" />
+							<svg
+								className="w-6 h-6 animate-spin"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-labelledby="generating-title"
+								role="img"
+							>
+								<title id="generating-title">Generating Puzzle</title>
+								<circle
+									className="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									strokeWidth="4"
+								/>
+								<path
+									className="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								/>
+							</svg>
 							<span className="text-sm tracking-widest-premium">
 								{t('main_menu.generating_label')}
 							</span>
@@ -240,7 +256,7 @@ const MainMenuScreen: React.FC = () => {
 			<PlayerMenu isOpen={isPlayerMenuOpen} onClose={() => setIsPlayerMenuOpen(false)} />
 
 			<SettingsMenu isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-		</motion.div>
+		</div>
 	);
 };
 
