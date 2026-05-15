@@ -220,7 +220,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 									</span>
 								</div>
 								<p className="font-sans text-[10px] text-secondary leading-relaxed">
-									{t('settings.version')}
+									{t('settings.version').replace('{version}', __APP_VERSION__)}
 									<br />
 									{t('settings.privacy')}
 								</p>

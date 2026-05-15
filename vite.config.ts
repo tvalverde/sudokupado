@@ -59,6 +59,9 @@ export default defineConfig({
 		}),
 	],
 	base: '/sudokupado/',
+	define: {
+		__APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+	},
 	resolve: {
 		alias: {
 			'@': resolve(__dirname, './src'),
