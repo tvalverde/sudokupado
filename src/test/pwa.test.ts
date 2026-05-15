@@ -13,27 +13,24 @@ vi.mock('virtual:pwa-register/react', () => ({
 }));
 
 describe('Regression: PWA Toast Mobile Layout', () => {
-	it('should render with responsive flex classes', () => {
+	it('should render with centered absolute positioning', () => {
 		render(React.createElement(ReloadPrompt));
 
-		// The main container inside motion.div
-		const container = screen.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i).parentElement
-			?.parentElement;
+		// Check the motion.div wrapper (it has left-1/2 class)
+		const container = screen
+			.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i)
+			.closest('div[class*="absolute"]');
 
 		expect(container).not.toBeNull();
-		// Check for flex-col (mobile) and sm:flex-row (tablet/desktop)
-		expect(container?.className).toContain('flex-col');
-		expect(container?.className).toContain('sm:flex-row');
+		expect(container?.className).toContain('absolute');
+		expect(container?.className).toContain('left-1/2');
 	});
 
 	it('should be positioned above BottomNavBar', () => {
 		render(React.createElement(ReloadPrompt));
-		const _motionDiv = screen
+		const wrapper = screen
 			.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i)
-			.closest('div[style*="opacity"]');
-		// We can check if it has the fixed and bottom classes
-		const wrapper = screen.getByText(/Sudokupado is ready|SUDOKUPADO ya puede/i).parentElement
-			?.parentElement?.parentElement;
+			.closest('div[class*="absolute"]');
 		expect(wrapper?.className).toContain('bottom-20');
 	});
 });
