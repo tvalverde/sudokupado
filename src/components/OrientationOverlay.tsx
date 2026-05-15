@@ -2,10 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Smartphone } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { useGameStore } from '../store/gameStore';
 
 const OrientationOverlay: React.FC = () => {
-	const { t } = useGameStore();
 	const [isLandscape, setIsLandscape] = useState(false);
 
 	useEffect(() => {
