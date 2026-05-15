@@ -241,9 +241,15 @@ const MainMenuScreen: React.FC = () => {
 							</span>
 						</div>
 					) : activePlayerId ? (
-						t('main_menu.play_button')
+						<div className="flex items-center justify-center gap-3">
+							<PlayCircle className="w-6 h-6 fill-current" />
+							<span>{t('main_menu.play_button').toUpperCase()}</span>
+						</div>
 					) : (
-						t('main_menu.play_guest')
+						<div className="flex items-center justify-center gap-3">
+							<PlayCircle className="w-6 h-6 fill-current" />
+							<span>{t('main_menu.play_guest').toUpperCase()}</span>
+						</div>
 					)}
 				</Button>
 			</div>
