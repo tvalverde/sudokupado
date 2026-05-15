@@ -15,9 +15,12 @@ let mockNeedRefresh = false;
 
 vi.mock('virtual:pwa-register/react', () => ({
 	useRegisterSW: (options: any) => {
-		// Trigger handlers for coverage
+		// Trigger handlers for coverage - silencing logs to keep test output clean
+		const originalLog = console.log;
+		console.log = vi.fn();
 		if (options?.onRegistered) options.onRegistered({} as any);
 		if (options?.onRegisterError) options.onRegisterError(new Error('test error'));
+		console.log = originalLog;
 
 		return {
 			offlineReady: [mockOfflineReady, mockSetOfflineReady],
