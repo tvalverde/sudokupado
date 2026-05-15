@@ -13,7 +13,7 @@ interface SettingsMenuProps {
 }
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
-	const { t, language, setLanguage, showDialog } = useGameStore();
+	const { t, language, setLanguage, showDialog, setActivePlayer } = useGameStore();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 

@@ -27,5 +27,8 @@ jobs:
       - name: Check Lint & Formatting (Biome)
         run: npm run lint
         
+      - name: Check Types (TypeScript)
+        run: npm run typecheck
+        
       - name: Run Tests
         run: npm test -- --run
