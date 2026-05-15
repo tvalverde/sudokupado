@@ -64,18 +64,6 @@ export default defineConfig({
 			'@': resolve(__dirname, './src'),
 		},
 	},
-	build: {
-		rollupOptions: {
-			output: {
-				manualChunks: {
-					'vendor-react': ['react', 'react-dom'],
-					'vendor-store': ['zustand'],
-					'vendor-db': ['dexie', 'dexie-react-hooks'],
-					'vendor-motion': ['framer-motion'],
-				},
-			},
-		},
-	},
 	test: {
 		globals: true,
 		environment: 'jsdom',
