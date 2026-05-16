@@ -285,14 +285,23 @@ export const useGameStore = create<GameStore>()(
 
 			setCellValue: (r, c, val) => {
 				const state = get();
-				if (state.grid[r][c] !== 0 && state.initialGrid[r][c] !== 0)
+
+				// Clear previous errors from the grid first
+				const cleanGrid = state.grid.map((row, ri) =>
+					row.map((cellVal, ci) =>
+						cellVal !== 0 && state.initialGrid[ri][ci] === 0 && cellVal !== state.solution[ri][ci]
+							? 0
+							: cellVal,
+					),
+				);
+
+				if (cleanGrid[r][c] !== 0 && state.initialGrid[r][c] !== 0)
 					return { isCorrect: true, isFinished: false };
 
 				const isCorrect = state.solution[r][c] === val;
 
 				if (isCorrect) {
-					const newGrid = state.grid.map((row) => [...row]);
-					newGrid[r][c] = val;
+					cleanGrid[r][c] = val;
 
 					const newNotes = state.notes.map((row) => row.map((cell) => [...cell]));
 					for (let i = 0; i < 9; i++) {
@@ -309,7 +318,7 @@ export const useGameStore = create<GameStore>()(
 						}
 					}
 
-					const isFinished = newGrid.every((row, ri) =>
+					const isFinished = cleanGrid.every((row, ri) =>
 						row.every((cell, ci) => cell === state.solution[ri][ci]),
 					);
 
@@ -318,21 +327,21 @@ export const useGameStore = create<GameStore>()(
 					const completedCols = [];
 					const completedBlocks = [];
 
-					if (newGrid[r].every((cell, ci) => cell === state.solution[r][ci])) {
+					if (cleanGrid[r].every((cell, ci) => cell === state.solution[r][ci])) {
 						completedRows.push(r);
 					}
-					if (newGrid.every((row, ri) => row[c] === state.solution[ri][c])) {
+					if (cleanGrid.every((row, ri) => row[c] === state.solution[ri][c])) {
 						completedCols.push(c);
 					}
 
 					// Only check block completion for standard 9x9 grids
-					if (newGrid.length === 9 && newGrid[0].length === 9) {
+					if (cleanGrid.length === 9 && cleanGrid[0].length === 9) {
 						const br = Math.floor(r / 3) * 3;
 						const bc = Math.floor(c / 3) * 3;
 						let blockComplete = true;
 						for (let i = 0; i < 3; i++) {
 							for (let j = 0; j < 3; j++) {
-								if (newGrid[br + i][bc + j] !== state.solution[br + i][bc + j]) {
+								if (cleanGrid[br + i][bc + j] !== state.solution[br + i][bc + j]) {
 									blockComplete = false;
 									break;
 								}
@@ -345,7 +354,7 @@ export const useGameStore = create<GameStore>()(
 						completedRows.length > 0 || completedCols.length > 0 || completedBlocks.length > 0;
 
 					set({
-						grid: newGrid,
+						grid: cleanGrid,
 						notes: newNotes,
 						activeAnimations: hasNewAnimation
 							? { rows: completedRows, cols: completedCols, blocks: completedBlocks }
@@ -360,14 +369,28 @@ export const useGameStore = create<GameStore>()(
 
 					return { isCorrect: true, isFinished };
 				} else {
-					set({ mistakes: state.mistakes + 1 });
+					cleanGrid[r][c] = val; // Temporarily show the error on the board
+					set({ grid: cleanGrid, mistakes: state.mistakes + 1 });
 					return { isCorrect: false, isFinished: false };
 				}
 			},
 
 			toggleNote: (r, c, val) => {
 				const state = get();
-				if (state.grid[r][c] !== 0) return;
+
+				// Clear errors first
+				const cleanGrid = state.grid.map((row, ri) =>
+					row.map((cellVal, ci) =>
+						cellVal !== 0 && state.initialGrid[ri][ci] === 0 && cellVal !== state.solution[ri][ci]
+							? 0
+							: cellVal,
+					),
+				);
+
+				if (cleanGrid[r][c] !== 0) {
+					set({ grid: cleanGrid });
+					return;
+				}
 
 				const newNotes = state.notes.map((row) => row.map((cell) => [...cell]));
 				const cellNotes = newNotes[r][c];
@@ -378,7 +401,7 @@ export const useGameStore = create<GameStore>()(
 					newNotes[r][c] = [...cellNotes, val].sort();
 				}
 
-				set({ notes: newNotes });
+				set({ grid: cleanGrid, notes: newNotes });
 			},
 
 			incrementTime: () =>
@@ -405,11 +428,22 @@ export const useGameStore = create<GameStore>()(
 				const state = get();
 				if (state.hintsUsed >= 3 || state.currentHint) return;
 
-				const logicalHint = engine.getLogicalHint(state.grid, state.solution);
+				// Clear errors when asking for a hint too
+				const cleanGrid = state.grid.map((row, ri) =>
+					row.map((cellVal, ci) =>
+						cellVal !== 0 && state.initialGrid[ri][ci] === 0 && cellVal !== state.solution[ri][ci]
+							? 0
+							: cellVal,
+					),
+				);
+
+				const logicalHint = engine.getLogicalHint(cleanGrid, state.solution);
 				if (logicalHint) {
 					set({
+						grid: cleanGrid,
 						currentHint: logicalHint,
 						selectedCell: { r: logicalHint.r, c: logicalHint.c },
+						hintsUsed: state.hintsUsed + 1,
 					});
 				}
 			},
@@ -426,7 +460,6 @@ export const useGameStore = create<GameStore>()(
 
 				set({
 					grid: newGrid,
-					hintsUsed: state.hintsUsed + 1,
 					currentHint: null,
 				});
 			},
@@ -436,7 +469,14 @@ export const useGameStore = create<GameStore>()(
 				// Solo borrar si la celda no es parte del puzzle inicial
 				if (state.initialGrid[r][c] !== 0) return;
 
-				const newGrid = state.grid.map((row) => [...row]);
+				// Clear all errors and also the targeted cell
+				const newGrid = state.grid.map((row, ri) =>
+					row.map((cellVal, ci) =>
+						cellVal !== 0 && state.initialGrid[ri][ci] === 0 && cellVal !== state.solution[ri][ci]
+							? 0
+							: cellVal,
+					),
+				);
 				newGrid[r][c] = 0;
 
 				set({ grid: newGrid });

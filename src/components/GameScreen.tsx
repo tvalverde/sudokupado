@@ -103,16 +103,19 @@ const GameScreen: React.FC = () => {
 		const baseScores = { beginner: 2000, intermediate: 4000, expert: 6000, master: 8000 };
 		const base = baseScores[selectedDifficulty] || 2000;
 
-		let hintPenalty = 0;
-		if (selectedDifficulty === 'beginner') {
-			hintPenalty = hintsUsed > 0 ? (hintsUsed - 1) * 100 : 0;
-		} else {
-			const costs = { intermediate: 200, expert: 400, master: 600 };
-			hintPenalty = hintsUsed * (costs[selectedDifficulty as keyof typeof costs] || 200);
+		// Asymptotic time decay: score is halved every 20 minutes (1200s), never reaches 0.
+		const timeMultiplier = 1200 / (1200 + timeElapsed);
+		let score = base * timeMultiplier;
+
+		// Fixed penalty for mistakes
+		score -= mistakes * 200;
+
+		// Exponential hint penalty: -10% per hint
+		if (hintsUsed > 0) {
+			score = score * 0.9 ** hintsUsed;
 		}
 
-		const score = base - timeElapsed - mistakes * 200 - hintPenalty;
-		return Math.max(0, score);
+		return Math.max(0, Math.floor(score));
 	}, [selectedDifficulty, hintsUsed, timeElapsed, mistakes]);
 
 	const handleNumberInput = useCallback(

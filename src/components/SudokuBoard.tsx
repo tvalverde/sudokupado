@@ -101,7 +101,7 @@ const SudokuBoard: React.FC = () => {
 										{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
 											<div
 												key={n}
-												className="flex items-center justify-center text-[10px] font-sans text-secondary leading-none"
+												className="flex items-center justify-center text-[12px] font-sans text-secondary leading-none"
 											>
 												{!isVictory && cellNotes.includes(n) ? n : ''}
 											</div>
