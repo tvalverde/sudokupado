@@ -3,7 +3,9 @@ import { ArrowLeft, Eraser, Lightbulb, Pause, Pencil, Play, RotateCcw, Trophy } 
 import type React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { db } from '../db/database';
+import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
+import { calculateScore } from '../utils/scoring';
 import SudokuBoard from './SudokuBoard';
 
 const GameScreen: React.FC = () => {
@@ -36,8 +38,12 @@ const GameScreen: React.FC = () => {
 		currentHint,
 		applyHint,
 		clearHint,
+		grid,
+		solution,
+		initialGrid,
 	} = useGameStore();
 
+	const { getHint } = useSudokuWorker();
 	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 	const isVictory = !!lastGameResult;
 
@@ -103,25 +109,6 @@ const GameScreen: React.FC = () => {
 		return () => clearInterval(timer);
 	}, [isPaused, incrementTime, isVictory]);
 
-	const calculateScore = useCallback(() => {
-		const baseScores = { beginner: 2000, intermediate: 4000, expert: 6000, master: 8000 };
-		const base = baseScores[selectedDifficulty] || 2000;
-
-		// Asymptotic time decay: score is halved every 20 minutes (1200s), never reaches 0.
-		const timeMultiplier = 1200 / (1200 + timeElapsed);
-		let score = base * timeMultiplier;
-
-		// Fixed penalty for mistakes
-		score -= mistakes * 200;
-
-		// Exponential hint penalty: -10% per hint
-		if (hintsUsed > 0) {
-			score = score * 0.9 ** hintsUsed;
-		}
-
-		return Math.max(0, Math.floor(score));
-	}, [selectedDifficulty, hintsUsed, timeElapsed, mistakes]);
-
 	const handleNumberInput = useCallback(
 		async (num: number) => {
 			if (isPaused || isVictory || !selectedCell) return;
@@ -159,7 +146,7 @@ const GameScreen: React.FC = () => {
 
 				if (isFinished) {
 					vibrate([200, 100, 200]);
-					const finalScore = calculateScore();
+					const finalScore = calculateScore(selectedDifficulty, timeElapsed, mistakes, hintsUsed);
 					let historyId: number | undefined;
 
 					if (activePlayerId) {
@@ -199,7 +186,6 @@ const GameScreen: React.FC = () => {
 			isNoteMode,
 			toggleNote,
 			setCellValue,
-			calculateScore,
 			timeElapsed,
 			selectedDifficulty,
 			mistakes,
@@ -353,7 +339,9 @@ const GameScreen: React.FC = () => {
 						<span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-wider">
 							{t('game.mistakes')}
 						</span>
-						<span className="font-hanken text-lg font-bold text-primary-text">{mistakes}/3</span>
+						<span className="font-hanken text-lg font-bold text-primary-text">
+							{mistakes}/{maxMistakes > 0 ? maxMistakes : '∞'}
+						</span>
 					</div>
 				</div>
 
@@ -436,9 +424,21 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
-						onClick={() => {
+						onClick={async () => {
 							vibrate(50);
-							triggerHint();
+							if (hintsUsed >= 3 || currentHint) return;
+
+							// Clear errors before sending grid to worker
+							const cleanGrid = grid.map((row, ri) =>
+								row.map((cellVal, ci) =>
+									cellVal !== 0 && initialGrid[ri][ci] === 0 && cellVal !== solution[ri][ci]
+										? 0
+										: cellVal,
+								),
+							);
+
+							const hint = await getHint(cleanGrid, solution);
+							triggerHint(hint);
 						}}
 						disabled={hintsUsed >= 3}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg disabled:opacity-30 transition-all active:scale-95"
