@@ -22,9 +22,22 @@ export const useSudokuWorker = () => {
 			}
 		};
 
+		const handleError = (e: ErrorEvent) => {
+			console.error('Sudoku Worker Error:', e);
+			for (const [id, resolve] of resolversRef.current) {
+				resolve(new Error('Worker crashed'));
+				resolversRef.current.delete(id);
+			}
+		};
+
 		workerRef.current.addEventListener('message', handleMessage);
+		workerRef.current.addEventListener('error', handleError);
 
 		return () => {
+			for (const [id, resolve] of resolversRef.current) {
+				resolve(new Error('Worker terminated'));
+				resolversRef.current.delete(id);
+			}
 			workerRef.current?.terminate();
 		};
 	}, []);

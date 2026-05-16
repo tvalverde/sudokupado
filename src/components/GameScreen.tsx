@@ -45,6 +45,17 @@ const GameScreen: React.FC = () => {
 
 	const { getHint } = useSudokuWorker();
 	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+	const isMountedRef = useRef(true);
+	const victoryTimeoutRef = useRef<any>(null);
+
+	useEffect(() => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+			if (victoryTimeoutRef.current) clearTimeout(victoryTimeoutRef.current);
+		};
+	}, []);
+
 	const isVictory = !!lastGameResult;
 
 	const vibrate = useCallback((pattern: number | number[]) => {
@@ -173,8 +184,10 @@ const GameScreen: React.FC = () => {
 						hintsUsed,
 					});
 
-					setTimeout(() => {
-						setScreen('result');
+					victoryTimeoutRef.current = setTimeout(() => {
+						if (isMountedRef.current) {
+							setScreen('result');
+						}
 					}, 3000);
 				}
 			}

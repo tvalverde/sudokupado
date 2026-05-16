@@ -21,8 +21,7 @@ const TrophiesScreen: React.FC = () => {
 	}, []);
 
 	const fullHistory = useLiveQuery(async () => {
-		const results = await db.history.toArray();
-		const players = await db.players.toArray();
+		const [results, players] = await Promise.all([db.history.toArray(), db.players.toArray()]);
 		const playerMap = new Map(players.map((p) => [p.id, p.name]));
 
 		return results

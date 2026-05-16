@@ -80,11 +80,17 @@ export const useAutoSave = () => {
 			saveGame();
 		}, 3000);
 
-		// Handle abrupt browser closures
+		// Handle abrupt browser closures and mobile suspension
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === 'hidden') {
+				saveGame(true);
+			}
+		};
 		const handleBeforeUnload = () => {
 			saveGame(true);
 		};
 		window.addEventListener('beforeunload', handleBeforeUnload);
+		document.addEventListener('visibilitychange', handleVisibilityChange);
 
 		// Subscription to capture critical screen/pause changes WITHOUT causing re-renders
 		const unsubscribe = useGameStore.subscribe((state, prevState) => {
@@ -99,6 +105,7 @@ export const useAutoSave = () => {
 		return () => {
 			clearInterval(interval);
 			window.removeEventListener('beforeunload', handleBeforeUnload);
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
 			unsubscribe();
 		};
 	}, [saveGame]);
