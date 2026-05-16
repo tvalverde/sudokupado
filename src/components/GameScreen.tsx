@@ -160,16 +160,17 @@ const GameScreen: React.FC = () => {
 				if (isFinished) {
 					vibrate([200, 100, 200]);
 					const finalScore = calculateScore();
+					let historyId: number | undefined;
 
 					if (activePlayerId) {
-						await db.history.add({
+						historyId = (await db.history.add({
 							playerId: activePlayerId,
 							difficulty: selectedDifficulty,
 							score: finalScore,
 							timeElapsed,
 							mistakes,
 							date: Date.now(),
-						});
+						})) as number;
 					}
 
 					const playerId = activePlayerId ?? 0;
@@ -177,6 +178,7 @@ const GameScreen: React.FC = () => {
 					if (existing?.id) await db.gameState.delete(existing.id);
 
 					setLastGameResult({
+						id: historyId,
 						score: finalScore,
 						timeElapsed,
 						difficulty: selectedDifficulty,

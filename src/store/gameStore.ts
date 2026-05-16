@@ -6,6 +6,7 @@ import { translations } from '../utils/translations';
 import { engine, type HintResult } from '../workers/sudokuWorker';
 
 export interface GameResult {
+	id?: number;
 	score: number;
 	timeElapsed: number;
 	difficulty: Difficulty;

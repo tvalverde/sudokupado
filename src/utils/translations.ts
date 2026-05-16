@@ -88,6 +88,8 @@ export const translations = {
 			no_victories: 'No victories yet',
 			win_message: 'Win a game to see your trophies here!',
 			pts: 'pts',
+			recent: 'Recent',
+			show_all: 'Show all history',
 		},
 		result: {
 			victory: 'VICTORY!',
@@ -97,6 +99,7 @@ export const translations = {
 			top_5: 'Top 5 - ',
 			new_game: 'NEW SUDOKUPADO',
 			return_home: 'RETURN HOME',
+			view_leaderboard: 'LEADERBOARD',
 		},
 		rules: {
 			title: 'RULES',
@@ -240,6 +243,8 @@ export const translations = {
 			no_victories: 'Sin victorias aún',
 			win_message: '¡Gana una partida para ver tus trofeos aquí!',
 			pts: 'pts',
+			recent: 'Reciente',
+			show_all: 'Ver todo el histórico',
 		},
 		result: {
 			victory: '¡VICTORIA!',
@@ -249,6 +254,7 @@ export const translations = {
 			top_5: 'Top 5 - ',
 			new_game: 'NUEVO SUDOKUPADO',
 			return_home: 'VOLVER AL MENÚ',
+			view_leaderboard: 'CLASIFICACIÓN',
 		},
 		rules: {
 			title: 'AYUDA',

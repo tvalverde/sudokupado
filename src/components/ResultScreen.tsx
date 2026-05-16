@@ -220,15 +220,26 @@ const ResultScreen: React.FC = () => {
 						</>
 					)}
 				</Button>
-				<Button
-					variant="secondary"
-					size="lg"
-					className="w-full gap-2"
-					onClick={() => setScreen('main')}
-				>
-					<Home className="w-5 h-5" />
-					{t('result.return_home')}
-				</Button>
+				<div className="grid grid-cols-2 gap-3">
+					<Button
+						variant="secondary"
+						size="lg"
+						className="w-full gap-2"
+						onClick={() => setScreen('trophies')}
+					>
+						<Trophy className="w-5 h-5" />
+						{t('result.view_leaderboard') || 'CLASIFICACIÓN'}
+					</Button>
+					<Button
+						variant="secondary"
+						size="lg"
+						className="w-full gap-2"
+						onClick={() => setScreen('main')}
+					>
+						<Home className="w-5 h-5" />
+						{t('result.return_home')}
+					</Button>
+				</div>
 			</footer>
 
 			<InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} />
