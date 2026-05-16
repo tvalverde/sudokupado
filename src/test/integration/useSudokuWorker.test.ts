@@ -22,8 +22,9 @@ describe('Integration: useSudokuWorker Bridge', () => {
 		// 1. Call the async function
 		const promise = result.current.generatePuzzle('beginner');
 
-		// 2. Verify postMessage was called correctly
+		// 2. Verify postMessage was called correctly (including the new ID logic)
 		expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+			id: 1,
 			type: 'GENERATE',
 			difficulty: 'beginner',
 		});
@@ -34,7 +35,7 @@ describe('Integration: useSudokuWorker Bridge', () => {
 			(call: any) => call[0] === 'message',
 		)[1];
 
-		messageHandler({ data: { type: 'GENERATED', payload: mockPayload } });
+		messageHandler({ data: { id: 1, type: 'GENERATED', payload: mockPayload } });
 
 		// 4. Verify resolution
 		const resolved = await promise;
@@ -50,6 +51,7 @@ describe('Integration: useSudokuWorker Bridge', () => {
 		const promise = result.current.getHint([[0]], [[5]]);
 
 		expect(mockWorkerInstance.postMessage).toHaveBeenCalledWith({
+			id: 1,
 			type: 'GET_HINT',
 			grid: [[0]],
 			solution: [[5]],
@@ -59,7 +61,7 @@ describe('Integration: useSudokuWorker Bridge', () => {
 			(call: any) => call[0] === 'message',
 		)[1];
 
-		messageHandler({ data: { type: 'HINT_GENERATED', payload: mockHint } });
+		messageHandler({ data: { id: 1, type: 'HINT_GENERATED', payload: mockHint } });
 
 		const resolved = await promise;
 		expect(resolved).toEqual(mockHint);

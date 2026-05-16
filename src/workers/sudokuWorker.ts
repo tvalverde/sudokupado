@@ -701,7 +701,7 @@ class SudokuEngine {
 export const engine = new SudokuEngine();
 
 export const workerHandler = (e: MessageEvent) => {
-	const { type, difficulty, grid, solution } = e.data;
+	const { id, type, difficulty, grid, solution } = e.data;
 
 	if (type === 'GENERATE') {
 		const solution = engine.generateFullBoard();
@@ -709,6 +709,7 @@ export const workerHandler = (e: MessageEvent) => {
 		const actualDifficulty = engine.analyzeDifficulty(initialGrid);
 
 		self.postMessage({
+			id,
 			type: 'GENERATED',
 			payload: { initialGrid, solution, difficulty: actualDifficulty },
 		});
@@ -717,6 +718,7 @@ export const workerHandler = (e: MessageEvent) => {
 	if (type === 'GET_HINT') {
 		const hint = engine.getLogicalHint(grid, solution);
 		self.postMessage({
+			id,
 			type: 'HINT_GENERATED',
 			payload: hint,
 		});

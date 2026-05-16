@@ -4,12 +4,25 @@ import type { HintResult } from '../workers/sudokuWorker';
 
 export const useSudokuWorker = () => {
 	const workerRef = useRef<Worker | null>(null);
+	const messageIdRef = useRef(0);
+	const resolversRef = useRef(new Map<number, (data: any) => void>());
 
 	useEffect(() => {
 		// Vite handles workers with ?worker suffix or new Worker(new URL(...))
 		workerRef.current = new Worker(new URL('../workers/sudokuWorker.ts', import.meta.url), {
 			type: 'module',
 		});
+
+		const handleMessage = (e: MessageEvent) => {
+			const { id, payload } = e.data;
+			const resolve = resolversRef.current.get(id);
+			if (resolve) {
+				resolve(payload);
+				resolversRef.current.delete(id);
+			}
+		};
+
+		workerRef.current.addEventListener('message', handleMessage);
 
 		return () => {
 			workerRef.current?.terminate();
@@ -21,15 +34,9 @@ export const useSudokuWorker = () => {
 			return new Promise((resolve) => {
 				if (!workerRef.current) return;
 
-				const handleMessage = (e: MessageEvent) => {
-					if (e.data.type === 'GENERATED') {
-						workerRef.current?.removeEventListener('message', handleMessage);
-						resolve(e.data.payload);
-					}
-				};
-
-				workerRef.current.addEventListener('message', handleMessage);
-				workerRef.current.postMessage({ type: 'GENERATE', difficulty });
+				const id = ++messageIdRef.current;
+				resolversRef.current.set(id, resolve);
+				workerRef.current.postMessage({ id, type: 'GENERATE', difficulty });
 			});
 		},
 		[],
@@ -39,15 +46,9 @@ export const useSudokuWorker = () => {
 		return new Promise((resolve) => {
 			if (!workerRef.current) return;
 
-			const handleMessage = (e: MessageEvent) => {
-				if (e.data.type === 'HINT_GENERATED') {
-					workerRef.current?.removeEventListener('message', handleMessage);
-					resolve(e.data.payload);
-				}
-			};
-
-			workerRef.current.addEventListener('message', handleMessage);
-			workerRef.current.postMessage({ type: 'GET_HINT', grid, solution });
+			const id = ++messageIdRef.current;
+			resolversRef.current.set(id, resolve);
+			workerRef.current.postMessage({ id, type: 'GET_HINT', grid, solution });
 		});
 	}, []);
 
