@@ -22,6 +22,21 @@ export const useAutoSave = () => {
 
 		const playerId = activePlayerId ?? 0;
 
+		// Session Integrity: Don't save if the game is already resolved or cleared
+		const isWon = currentState.lastGameResult !== null;
+		const isLost =
+			currentState.maxMistakes > 0 && currentState.mistakes >= currentState.maxMistakes;
+		const isCleared = currentState.solution[0]?.[0] === 0; // initGame sets solution to emptyGrid on clear
+
+		if (isWon || isLost || isCleared) {
+			db.gameState
+				.where('playerId')
+				.equals(playerId)
+				.delete()
+				.catch((err) => console.error('Failed to clean zombie state:', err));
+			return;
+		}
+
 		// Create a snapshot of the current state to detect changes
 		const stateSnapshot = JSON.stringify({
 			grid: currentState.grid,

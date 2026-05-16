@@ -242,7 +242,7 @@ export const useGameStore = create<GameStore>()(
 					mistakes: saved.mistakes,
 					hintsUsed: saved.hintsUsed,
 					timeElapsed: saved.timeElapsed,
-					isPaused: true,
+					isPaused: false,
 					selectedDifficulty: saved.difficulty,
 					selectedCell: null,
 					isNoteMode: false,

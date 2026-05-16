@@ -10,6 +10,7 @@ vi.mock('../db/database', () => ({
 		gameState: {
 			where: vi.fn().mockReturnThis(),
 			equals: vi.fn().mockReturnThis(),
+			delete: vi.fn().mockResolvedValue(undefined),
 			first: vi.fn(),
 			update: vi.fn(),
 			add: vi.fn(),
@@ -26,6 +27,10 @@ describe('useAutoSave persistence throttle', () => {
 			Array(9)
 				.fill(null)
 				.map(() => Array(9).fill(0));
+		const full9x9 = () =>
+			Array(9)
+				.fill(null)
+				.map(() => Array(9).fill(1));
 		const emptyNotes = () =>
 			Array(9)
 				.fill(null)
@@ -46,8 +51,8 @@ describe('useAutoSave persistence throttle', () => {
 			mistakes: 0,
 			hintsUsed: 0,
 			selectedDifficulty: 'beginner',
-			initialGrid: empty9x9(),
-			solution: empty9x9(),
+			initialGrid: full9x9(), // Non-empty to avoid isCleared
+			solution: full9x9(), // Non-empty to avoid isCleared
 		});
 
 		// Mock db.gameState.first to return null (first save)
