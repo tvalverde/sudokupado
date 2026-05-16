@@ -75,7 +75,11 @@ interface GameStore {
 	resumeGame: (savedState: GameState) => void;
 	restartGame: () => void;
 	clearSavedGame: () => void;
-	setCellValue: (r: number, c: number, val: number) => { isCorrect: boolean; isFinished: boolean };
+	setCellValue: (
+		r: number,
+		c: number,
+		val: number,
+	) => { isCorrect: boolean; isFinished: boolean; isCellOccupied?: boolean };
 	toggleNote: (r: number, c: number, val: number) => void;
 	setSelectedCell: (r: number, c: number | null) => void;
 	setNoteMode: (isNoteMode: boolean) => void;
@@ -298,8 +302,8 @@ export const useGameStore = create<GameStore>()(
 					),
 				);
 
-				if (cleanGrid[r][c] !== 0 && state.initialGrid[r][c] !== 0)
-					return { isCorrect: true, isFinished: false };
+				if (cleanGrid[r][c] !== 0)
+					return { isCorrect: true, isFinished: false, isCellOccupied: true };
 
 				const isCorrect = state.solution[r][c] === val;
 

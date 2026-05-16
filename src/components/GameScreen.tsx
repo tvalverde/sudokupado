@@ -128,7 +128,12 @@ const GameScreen: React.FC = () => {
 			if (isNoteMode) {
 				toggleNote(r, c, num);
 			} else {
-				const { isCorrect, isFinished } = setCellValue(r, c, num);
+				const { isCorrect, isFinished, isCellOccupied } = setCellValue(r, c, num);
+
+				if (isCellOccupied) {
+					vibrate([100, 50, 100]);
+					return;
+				}
 
 				if (!isCorrect) {
 					vibrate([100, 50, 100]);
