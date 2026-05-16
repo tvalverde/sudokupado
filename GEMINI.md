@@ -20,4 +20,5 @@ This document outlines the strict behavioral rules for Gemini CLI during the dev
 11. **User Consultation Options:** When using the `ask_user` tool with the `choice` type, ALWAYS provide at least 3 distinct options. Additionally, ALWAYS explicitly state which option is recommended and provide a brief technical justification for that recommendation.
 12. **Commit Messages:** Conventional Commits MUST clearly and technically explain the changes made and the value they add. NEVER mention "TODO", "backlog", or refer to task lists in the commit message.
 13. **TODO.md Protection:** The `TODO.md` file MUST NEVER be staged or committed to the repository. It is for local task tracking only.
+14. **Strategic Delegation:** The primary agent (Pro model) MUST ALWAYS handle planning, complex logic, architectural design, and deep refactoring. Subagents (e.g., generalist/Flash) are STRICTLY limited to atomic, mechanical, and well-defined tasks (like running scripts, formatting, or mass simple replacements). Architectural decisions or critical bug resolution MUST NEVER be delegated to a subagent.
 
