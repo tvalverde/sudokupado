@@ -8,7 +8,7 @@ This document outlines the strict behavioral rules for Gemini CLI during the dev
 2.  **English Technical Artifacts:** All source code, variable names, functions, interfaces, inline comments, documentation, and tests MUST be written strictly in English.
 3.  **Castilian Spanish Communication:** All conversational interactions and explanations with the user MUST be in Castilian Spanish.
 4.  **Design System Adherence:** All UI changes MUST strictly follow the rules defined in `DESIGN.md`.
-5.  **Versioning (SemVer):** The project uses Semantic Versioning for Git tags.
+5.  **Versioning (SemVer):** The project uses Semantic Versioning for Git tags. All version tags MUST be **annotated tags** (using `git tag -a vX.Y.Z -m 'message'`) to include authorship metadata and date in the repository history.
     *   **MAJOR:** Backward-incompatible, drastic changes.
     *   **MINOR:** New features that are backward-compatible.
     *   **PATCH:** Bug fixes that are backward-compatible.
