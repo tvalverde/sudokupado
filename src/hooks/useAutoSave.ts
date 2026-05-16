@@ -3,18 +3,11 @@ import { db } from '../db/database';
 import { useGameStore } from '../store/gameStore';
 
 export const useAutoSave = () => {
-	const state = useGameStore();
 	const lastSavedStateRef = useRef<string>('');
-	const stateRef = useRef(state);
-	const lastScreenRef = useRef(state.activeScreen);
-
-	// Sync the latest state to a ref to avoid stale closures in the interval
-	useEffect(() => {
-		stateRef.current = state;
-	}, [state]);
 
 	const saveGame = useCallback(async (force = false) => {
-		const currentState = stateRef.current;
+		// Use getState() to avoid subscribing to state changes and causing re-renders
+		const currentState = useGameStore.getState();
 		const { activePlayerId, activeScreen } = currentState;
 
 		// We allow guest (activePlayerId === null) to be saved using ID 0
@@ -26,7 +19,7 @@ export const useAutoSave = () => {
 		const isWon = currentState.lastGameResult !== null;
 		const isLost =
 			currentState.maxMistakes > 0 && currentState.mistakes >= currentState.maxMistakes;
-		const isCleared = currentState.solution[0]?.[0] === 0; // initGame sets solution to emptyGrid on clear
+		const isCleared = currentState.solution[0]?.[0] === 0;
 
 		if (isWon || isLost || isCleared) {
 			db.gameState
@@ -80,24 +73,33 @@ export const useAutoSave = () => {
 		}
 	}, []);
 
-	// Periodic throttle: attempt to save every 3 seconds
+	// Main auto-save lifecycle
 	useEffect(() => {
+		// Periodic throttle: attempt to save every 3 seconds
 		const interval = setInterval(() => {
 			saveGame();
 		}, 3000);
 
-		return () => clearInterval(interval);
-	}, [saveGame]);
-
-	// Immediate save on critical events to ensure no data loss
-	useEffect(() => {
-		const wasInGame = lastScreenRef.current === 'game';
-		const hasLeftGame = wasInGame && state.activeScreen !== 'game';
-
-		if (state.isPaused || hasLeftGame) {
+		// Handle abrupt browser closures
+		const handleBeforeUnload = () => {
 			saveGame(true);
-		}
+		};
+		window.addEventListener('beforeunload', handleBeforeUnload);
 
-		lastScreenRef.current = state.activeScreen;
-	}, [state.isPaused, state.activeScreen, saveGame]);
+		// Subscription to capture critical screen/pause changes WITHOUT causing re-renders
+		const unsubscribe = useGameStore.subscribe((state, prevState) => {
+			const hasLeftGame = prevState.activeScreen === 'game' && state.activeScreen !== 'game';
+			const hasPaused = !prevState.isPaused && state.isPaused;
+
+			if (hasPaused || hasLeftGame) {
+				saveGame(true);
+			}
+		});
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+			unsubscribe();
+		};
+	}, [saveGame]);
 };
