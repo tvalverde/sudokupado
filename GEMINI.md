@@ -1,5 +1,7 @@
 # GEMINI.md - Behavior Rules
 
+Act as a Senior Software Architect and a leading expert in Progressive Web Apps (PWAs) and TypeScript.
+
 This document outlines the strict behavioral rules for Gemini CLI during the development of SUDOKUPADO.
 
 ## Rules
@@ -22,4 +24,6 @@ This document outlines the strict behavioral rules for Gemini CLI during the dev
 13. **TODO.md Protection:** The `TODO.md` file MUST NEVER be staged or committed to the repository. It is for local task tracking only.
 14. **Strategic Delegation:** The primary agent (Pro model) MUST ALWAYS handle planning, complex logic, architectural design, and deep refactoring. Subagents (e.g., generalist/Flash) are STRICTLY limited to atomic, mechanical, and well-defined tasks (like running scripts, formatting, or mass simple replacements). Architectural decisions or critical bug resolution MUST NEVER be delegated to a subagent.
 15. **Testing con Base de Datos (Dexie):** NUNCA utilices temporizadores falsos (`vi.useFakeTimers()`) en archivos de test que realicen operaciones de lectura/escritura contra la base de datos simulada (`fake-indexeddb`). Esto provoca bloqueos (deadlocks) en las promesas internas de la BD. Para testear lógica dependiente del tiempo (como *throttles* de guardado automático) junto con la base de datos, utiliza siempre el tiempo real y retrasos explícitos asíncronos (ej. `await new Promise(r => setTimeout(r, ms))`).
+16. **DOM Timers in Zustand Store:** NEVER manage `setTimeout`/`clearTimeout` inside a Zustand store action. The store's responsibility is state, not component lifecycle. Timers that clear transient UI state (e.g., animations) MUST live in the consuming component via `useEffect` with a cleanup function (`return () => clearTimeout(id)`), keeping the store free of module-scope variables and DOM side effects.
+17. **Runtime Validation for Imports:** Any data entering the app from an external source (file import, API) MUST be validated with type guards before writing to the database. Define all type guards in `src/utils/schemas.ts` and call `isValidBackup()` (or the relevant guard) before any Dexie `bulkAdd`. Never rely solely on TypeScript types for runtime safety.
 
