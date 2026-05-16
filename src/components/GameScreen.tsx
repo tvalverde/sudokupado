@@ -155,12 +155,6 @@ const GameScreen: React.FC = () => {
 
 				if (isFinished) {
 					const finalScore = calculateScore();
-					const result = {
-						score: finalScore,
-						timeElapsed,
-						difficulty: selectedDifficulty,
-						mistakes,
-					};
 
 					if (activePlayerId) {
 						await db.history.add({
@@ -168,6 +162,7 @@ const GameScreen: React.FC = () => {
 							difficulty: selectedDifficulty,
 							score: finalScore,
 							timeElapsed,
+							mistakes,
 							date: Date.now(),
 						});
 					}
@@ -176,7 +171,13 @@ const GameScreen: React.FC = () => {
 					const existing = await db.gameState.where('playerId').equals(playerId).first();
 					if (existing?.id) await db.gameState.delete(existing.id);
 
-					setLastGameResult(result);
+					setLastGameResult({
+						score: finalScore,
+						timeElapsed,
+						difficulty: selectedDifficulty,
+						mistakes,
+						hintsUsed,
+					});
 
 					setTimeout(() => {
 						setScreen('result');
@@ -204,6 +205,7 @@ const GameScreen: React.FC = () => {
 			showDialog,
 			restartGame,
 			t,
+			hintsUsed,
 		],
 	);
 
@@ -291,36 +293,6 @@ const GameScreen: React.FC = () => {
 			exit={{ opacity: 0, x: -20 }}
 			className="flex flex-col h-full bg-white relative"
 		>
-			{/* Dramatic Victory Animation */}
-			<AnimatePresence>
-				{isVictory && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.5 }}
-						animate={{ opacity: 1, scale: 1 }}
-						className="absolute inset-0 z-[100] flex flex-col items-center justify-center pointer-events-none"
-					>
-						<motion.div
-							animate={{
-								rotateY: [0, 360],
-								scale: [1, 1.2, 1],
-							}}
-							transition={{ duration: 1.5, repeat: Infinity }}
-							className="bg-white/80 backdrop-blur-md p-10 rounded-full border-4 border-green-500 shadow-2xl"
-						>
-							<Trophy className="w-24 h-24 text-green-600" />
-						</motion.div>
-						<motion.h2
-							initial={{ y: 20, opacity: 0 }}
-							animate={{ y: 0, opacity: 1 }}
-							transition={{ delay: 0.5 }}
-							className="font-hanken text-5xl font-black text-green-700 mt-8 tracking-widest-premium"
-						>
-							{t('game.victory')}
-						</motion.h2>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
 			{/* TopAppBar */}
 			<header className="w-full border-b border-border bg-white flex justify-between items-center px-5 h-16 z-10">
 				<button
@@ -343,9 +315,7 @@ const GameScreen: React.FC = () => {
 			</header>
 
 			{/* Main Game Container */}
-			<main
-				className={`flex-1 flex flex-col px-5 pt-4 pb-24 overflow-y-auto transition-opacity duration-1000 ${isVictory ? 'opacity-30' : 'opacity-100'}`}
-			>
+			<main className="flex-1 flex flex-col px-5 pt-4 pb-24 overflow-y-auto">
 				{/* Status Bar */}
 				<div className="flex justify-between items-center bg-subtle-bg rounded-full px-4 py-2 mb-6 border border-border">
 					<div className="flex flex-col items-start">
@@ -375,6 +345,34 @@ const GameScreen: React.FC = () => {
 				{/* Sudoku Grid */}
 				<div className="relative">
 					<SudokuBoard />
+					<AnimatePresence>
+						{isVictory && (
+							<motion.div
+								initial={{ opacity: 0, scale: 0.5 }}
+								animate={{ opacity: 1, scale: 1 }}
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none"
+							>
+								<motion.div
+									animate={{
+										rotateY: [0, 360],
+										scale: [1, 1.2, 1],
+									}}
+									transition={{ duration: 1.5, repeat: Infinity }}
+									className="bg-white/80 backdrop-blur-md p-6 rounded-full border-4 border-green-500 shadow-2xl"
+								>
+									<Trophy className="w-16 h-16 text-green-600" />
+								</motion.div>
+								<motion.h2
+									initial={{ y: 20, opacity: 0 }}
+									animate={{ y: 0, opacity: 1 }}
+									transition={{ delay: 0.5 }}
+									className="font-hanken text-3xl font-black text-green-700 mt-4 tracking-widest-premium"
+								>
+									{t('game.victory')}
+								</motion.h2>
+							</motion.div>
+						)}
+					</AnimatePresence>
 					{isPaused && !isVictory && (
 						<button
 							type="button"

@@ -23,6 +23,7 @@ export interface HistoryEntry {
 	difficulty: Difficulty;
 	score: number;
 	timeElapsed: number; // In seconds
+	mistakes: number;
 	date: number; // Timestamp
 }
 

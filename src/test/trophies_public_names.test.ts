@@ -26,15 +26,17 @@ describe('Regression: Public Trophies Ranking', () => {
 		await db.history.add({
 			playerId: juanId as number,
 			difficulty: 'beginner',
-			score: 1500,
-			timeElapsed: 300,
+			score: 500,
+			timeElapsed: 600,
+			mistakes: 0,
 			date: Date.now(),
 		});
 		await db.history.add({
 			playerId: mariaId as number,
 			difficulty: 'expert',
-			score: 4500,
-			timeElapsed: 600,
+			score: 1200,
+			timeElapsed: 1200,
+			mistakes: 1,
 			date: Date.now() - 1000,
 		});
 

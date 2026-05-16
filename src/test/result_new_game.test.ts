@@ -23,10 +23,11 @@ describe('Regression: ResultScreen New Game Button', () => {
 		// 1. Setup a victory state
 		useGameStore.setState({
 			lastGameResult: {
-				score: 5000,
-				timeElapsed: 120,
-				difficulty: 'beginner',
+				score: 1000,
+				timeElapsed: 300,
+				difficulty: 'beginner' as const,
 				mistakes: 0,
+				hintsUsed: 0,
 			},
 			activeScreen: 'result',
 		});

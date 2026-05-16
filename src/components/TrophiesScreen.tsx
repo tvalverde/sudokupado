@@ -113,11 +113,15 @@ const TrophiesScreen: React.FC = () => {
 								<span className="font-sans text-xs text-secondary">{formatDate(entry.date)}</span>
 							</div>
 							<div className="flex justify-between items-end pt-1">
-								<div className="flex items-center gap-1 text-secondary">
-									<Timer className="w-4 h-4" />
-									<span className="font-sans text-sm">
-										{t('game.time')}: {formatTime(entry.timeElapsed)}
-									</span>
+								<div className="flex items-center gap-3 text-secondary">
+									<div className="flex items-center gap-1">
+										<Timer className="w-3.5 h-3.5" />
+										<span className="font-sans text-xs">{formatTime(entry.timeElapsed)}</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<span className="font-sans text-xs font-bold text-error">{entry.mistakes}</span>
+										<span className="font-sans text-[10px] uppercase">{t('game.mistakes')}</span>
+									</div>
 								</div>
 								<div className="flex flex-col items-end">
 									<span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-wider leading-none mb-1">

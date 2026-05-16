@@ -10,6 +10,7 @@ export interface GameResult {
 	timeElapsed: number;
 	difficulty: Difficulty;
 	mistakes: number;
+	hintsUsed: number;
 }
 
 export type Language = 'en' | 'es';
