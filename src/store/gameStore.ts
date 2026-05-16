@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { db } from '../db/database';
 import type { Difficulty, GameState, ScreenType } from '../types';
 import { translations } from '../utils/translations';
-import { engine, type HintResult } from '../workers/sudokuWorker';
+import type { HintResult } from '../workers/sudokuWorker';
 
 export interface GameResult {
 	id?: number;
@@ -82,7 +82,7 @@ interface GameStore {
 	incrementTime: () => void;
 	setPaused: (paused: boolean) => void;
 	isNumberCompleted: (num: number) => boolean;
-	useHint: () => void;
+	useHint: (logicalHint: HintResult) => void;
 	clearHint: () => void;
 	applyHint: () => void;
 	eraseCell: (r: number, c: number) => void;
@@ -112,6 +112,9 @@ const DEFAULT_PREFS = {
 	allowNotes: true,
 	maxMistakes: 3,
 };
+
+// Module-scoped variable to track the animation timeout
+let animationTimeout: any = null;
 
 export const useGameStore = create<GameStore>()(
 	persist(
@@ -364,8 +367,10 @@ export const useGameStore = create<GameStore>()(
 					});
 
 					if (hasNewAnimation) {
-						setTimeout(() => {
+						if (animationTimeout) clearTimeout(animationTimeout);
+						animationTimeout = setTimeout(() => {
 							set({ activeAnimations: { rows: [], cols: [], blocks: [] } });
+							animationTimeout = null;
 						}, 1000);
 					}
 
@@ -426,23 +431,12 @@ export const useGameStore = create<GameStore>()(
 				return count >= 9;
 			},
 
-			useHint: () => {
+			useHint: (logicalHint: HintResult) => {
 				const state = get();
 				if (state.hintsUsed >= 3 || state.currentHint) return;
 
-				// Clear errors when asking for a hint too
-				const cleanGrid = state.grid.map((row, ri) =>
-					row.map((cellVal, ci) =>
-						cellVal !== 0 && state.initialGrid[ri][ci] === 0 && cellVal !== state.solution[ri][ci]
-							? 0
-							: cellVal,
-					),
-				);
-
-				const logicalHint = engine.getLogicalHint(cleanGrid, state.solution);
 				if (logicalHint) {
 					set({
-						grid: cleanGrid,
 						currentHint: logicalHint,
 						selectedCell: { r: logicalHint.r, c: logicalHint.c },
 						hintsUsed: state.hintsUsed + 1,
