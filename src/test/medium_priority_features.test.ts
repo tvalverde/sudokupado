@@ -1,29 +1,7 @@
 import { act } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { db } from '../db/database';
+import { describe, expect, it } from 'vitest';
 import { useGameStore } from '../store/gameStore';
 import { calculateScore } from '../utils/scoring';
-
-// Mock the database for transaction test
-vi.mock('../db/database', () => ({
-	db: {
-		transaction: vi.fn((_type, _tables, callback) => callback()),
-		gameState: {
-			where: vi.fn().mockReturnThis(),
-			equals: vi.fn().mockReturnThis(),
-			delete: vi.fn().mockResolvedValue(undefined),
-			first: vi.fn().mockResolvedValue(null),
-			update: vi.fn().mockResolvedValue(undefined),
-			add: vi.fn().mockResolvedValue(undefined),
-		},
-		history: {
-			add: vi.fn().mockResolvedValue(123),
-		},
-		players: {
-			toArray: vi.fn().mockResolvedValue([]),
-		},
-	},
-}));
 
 describe('Audit Fixes & Regression', () => {
 	it('Scoring Utility: should match asymptotic decay formula', () => {
@@ -36,8 +14,6 @@ describe('Audit Fixes & Regression', () => {
 	});
 
 	it('Hints UX: should increment hintsUsed when triggerHint is called with a hint', async () => {
-		const store = useGameStore.getState();
-
 		act(() => {
 			useGameStore.setState({ hintsUsed: 0, currentHint: null });
 		});

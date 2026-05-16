@@ -20,13 +20,14 @@ const localStorageMock = (() => {
 })();
 
 // Mock Worker for jsdom
-class WorkerMock {
-	onmessage: ((ev: MessageEvent) => any) | null = null;
-	terminate = vi.fn();
-	postMessage = vi.fn();
-	addEventListener = vi.fn();
-	removeEventListener = vi.fn();
-}
+const WorkerMock = vi.fn().mockImplementation(function (this: any) {
+	this.onmessage = null;
+	this.terminate = vi.fn();
+	this.postMessage = vi.fn();
+	this.addEventListener = vi.fn();
+	this.removeEventListener = vi.fn();
+	return this;
+});
 
 vi.stubGlobal('Worker', WorkerMock);
 
