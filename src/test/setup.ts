@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import 'fake-indexeddb/auto';
 
 // Mock localStorage
@@ -17,6 +18,17 @@ const localStorageMock = (() => {
 		},
 	};
 })();
+
+// Mock Worker for jsdom
+class WorkerMock {
+	onmessage: ((ev: MessageEvent) => any) | null = null;
+	terminate = vi.fn();
+	postMessage = vi.fn();
+	addEventListener = vi.fn();
+	removeEventListener = vi.fn();
+}
+
+vi.stubGlobal('Worker', WorkerMock);
 
 Object.defineProperty(window, 'localStorage', {
 	value: localStorageMock,

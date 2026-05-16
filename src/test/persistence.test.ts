@@ -7,6 +7,7 @@ import { useGameStore } from '../store/gameStore';
 // Mock the database
 vi.mock('../db/database', () => ({
 	db: {
+		transaction: vi.fn((_mode, _tables, callback) => callback()),
 		gameState: {
 			where: vi.fn().mockReturnThis(),
 			equals: vi.fn().mockReturnThis(),
