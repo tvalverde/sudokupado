@@ -51,26 +51,28 @@ export const useAutoSave = () => {
 		if (!force && stateSnapshot === lastSavedStateRef.current) return;
 
 		try {
-			const existing = await db.gameState.where('playerId').equals(playerId).first();
+			await db.transaction('rw', db.gameState, async () => {
+				const existing = await db.gameState.where('playerId').equals(playerId).first();
 
-			const data = {
-				playerId: playerId,
-				grid: currentState.grid,
-				initialGrid: currentState.initialGrid,
-				solution: currentState.solution,
-				notes: currentState.notes,
-				timeElapsed: currentState.timeElapsed,
-				mistakes: currentState.mistakes,
-				hintsUsed: currentState.hintsUsed,
-				isPaused: currentState.isPaused,
-				difficulty: currentState.selectedDifficulty,
-			};
+				const data = {
+					playerId: playerId,
+					grid: currentState.grid,
+					initialGrid: currentState.initialGrid,
+					solution: currentState.solution,
+					notes: currentState.notes,
+					timeElapsed: currentState.timeElapsed,
+					mistakes: currentState.mistakes,
+					hintsUsed: currentState.hintsUsed,
+					isPaused: currentState.isPaused,
+					difficulty: currentState.selectedDifficulty,
+				};
 
-			if (existing) {
-				await db.gameState.update(existing.id!, data);
-			} else {
-				await db.gameState.add(data);
-			}
+				if (existing) {
+					await db.gameState.update(existing.id!, data);
+				} else {
+					await db.gameState.add(data);
+				}
+			});
 
 			lastSavedStateRef.current = stateSnapshot;
 		} catch (error) {
