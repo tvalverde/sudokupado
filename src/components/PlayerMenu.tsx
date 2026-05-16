@@ -37,6 +37,12 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 			message: t('player_menu.delete_prompt_msg').replace('{name}', name),
 			onConfirm: async () => {
 				await db.players.update(id, { isDeleted: 1 });
+
+				// Cleanup related data
+				await db.preferences.where('playerId').equals(id).delete();
+				await db.gameState.where('playerId').equals(id).delete();
+				await db.history.where('playerId').equals(id).delete();
+
 				if (activePlayerId === id) {
 					setActivePlayer(null);
 				}
