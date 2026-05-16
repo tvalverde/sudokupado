@@ -122,7 +122,7 @@ const GameScreen: React.FC = () => {
 				if (!isCorrect) {
 					vibrate([100, 50, 100]);
 
-					if (mistakes + 1 >= maxMistakes) {
+					if (maxMistakes > 0 && mistakes + 1 >= maxMistakes) {
 						setPaused(true);
 						showDialog({
 							title: t('game.game_over_title'),
