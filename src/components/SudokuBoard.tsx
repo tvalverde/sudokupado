@@ -66,7 +66,7 @@ const SudokuBoard: React.FC = () => {
 										isVictory
 											? 'bg-transparent'
 											: isAnimating(r, c)
-												? 'bg-primary-text z-20 transition-all duration-300 scale-105'
+												? 'bg-[#fcdeb5] shadow-[0_0_20px_rgba(252,222,181,0.6)] z-20 transition-all duration-300 scale-105'
 												: isHintCell(r, c)
 													? 'bg-yellow-100 animate-pulse'
 													: isSelected(r, c)
@@ -91,7 +91,7 @@ const SudokuBoard: React.FC = () => {
 									<span
 										className={`
                     text-4xl transition-colors duration-1000
-                    ${isVictory ? 'text-green-700 font-bold' : isInitial ? 'text-primary-text font-black' : isAnimating(r, c) ? 'text-white font-bold' : isError ? 'text-error font-bold' : 'text-slate-600 font-bold'}
+                    ${isVictory ? 'text-green-700 font-bold' : isInitial ? 'text-primary-text font-black' : isError ? 'text-error font-bold' : 'text-slate-600 font-bold'}
                   `}
 									>
 										{val}
@@ -101,7 +101,7 @@ const SudokuBoard: React.FC = () => {
 										{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
 											<div
 												key={n}
-												className="flex items-center justify-center text-[12px] font-sans text-secondary leading-none"
+												className="flex items-center justify-center text-[12px] md:text-sm font-sans font-bold text-secondary leading-none"
 											>
 												{!isVictory && cellNotes.includes(n) ? n : ''}
 											</div>

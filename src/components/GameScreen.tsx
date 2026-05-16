@@ -18,7 +18,7 @@ const GameScreen: React.FC = () => {
 		isNoteMode,
 		setNoteMode,
 		hintsUsed,
-		useHint,
+		useHint: triggerHint,
 		selectedCell,
 		setSelectedCell,
 		setCellValue,
@@ -40,6 +40,10 @@ const GameScreen: React.FC = () => {
 
 	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 	const isVictory = !!lastGameResult;
+
+	const vibrate = useCallback((pattern: number | number[]) => {
+		if (navigator.vibrate) navigator.vibrate(pattern);
+	}, []);
 
 	// Native APIs: Wake Lock & Fullscreen & Back Button
 	useEffect(() => {
@@ -129,7 +133,7 @@ const GameScreen: React.FC = () => {
 				const { isCorrect, isFinished } = setCellValue(r, c, num);
 
 				if (!isCorrect) {
-					if (navigator.vibrate) navigator.vibrate(200);
+					vibrate([100, 50, 100]);
 
 					if (mistakes + 1 >= maxMistakes) {
 						setPaused(true);
@@ -154,6 +158,7 @@ const GameScreen: React.FC = () => {
 				}
 
 				if (isFinished) {
+					vibrate([200, 100, 200]);
 					const finalScore = calculateScore();
 
 					if (activePlayerId) {
@@ -206,6 +211,7 @@ const GameScreen: React.FC = () => {
 			restartGame,
 			t,
 			hintsUsed,
+			vibrate,
 		],
 	);
 
@@ -270,6 +276,7 @@ const GameScreen: React.FC = () => {
 	};
 
 	const handleRestartClick = () => {
+		vibrate(50);
 		showDialog({
 			title: 'Restart Puzzle',
 			message: 'Are you sure you want to clear your progress and start this puzzle over?',
@@ -281,9 +288,15 @@ const GameScreen: React.FC = () => {
 	};
 
 	const handleErase = () => {
+		vibrate(50);
 		if (selectedCell) {
 			eraseCell(selectedCell.r, selectedCell.c);
 		}
+	};
+
+	const handleNumberClick = (num: number) => {
+		vibrate(50);
+		handleNumberInput(num);
 	};
 
 	return (
@@ -358,18 +371,18 @@ const GameScreen: React.FC = () => {
 										scale: [1, 1.2, 1],
 									}}
 									transition={{ duration: 1.5, repeat: Infinity }}
-									className="bg-white/80 backdrop-blur-md p-6 rounded-full border-4 border-green-500 shadow-2xl"
+									className="bg-white/90 backdrop-blur-lg p-8 rounded-3xl border-4 border-green-500 shadow-2xl flex flex-col items-center gap-6"
 								>
 									<Trophy className="w-16 h-16 text-green-600" />
+									<motion.h2
+										initial={{ y: 20, opacity: 0 }}
+										animate={{ y: 0, opacity: 1 }}
+										transition={{ delay: 0.5 }}
+										className="font-hanken text-3xl font-black text-green-700 tracking-widest-premium"
+									>
+										{t('game.victory')}
+									</motion.h2>
 								</motion.div>
-								<motion.h2
-									initial={{ y: 20, opacity: 0 }}
-									animate={{ y: 0, opacity: 1 }}
-									transition={{ delay: 0.5 }}
-									className="font-hanken text-3xl font-black text-green-700 mt-4 tracking-widest-premium"
-								>
-									{t('game.victory')}
-								</motion.h2>
 							</motion.div>
 						)}
 					</AnimatePresence>
@@ -404,7 +417,10 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
-						onClick={() => setNoteMode(!isNoteMode)}
+						onClick={() => {
+							vibrate(50);
+							setNoteMode(!isNoteMode);
+						}}
 						className={`flex flex-col items-center justify-center py-3 rounded-xl transition-all active:scale-95 ${
 							isNoteMode
 								? 'bg-primary-text text-white shadow-md'
@@ -418,7 +434,10 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
-						onClick={useHint}
+						onClick={() => {
+							vibrate(50);
+							triggerHint();
+						}}
 						disabled={hintsUsed >= 3}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg disabled:opacity-30 transition-all active:scale-95"
 					>
@@ -451,7 +470,7 @@ const GameScreen: React.FC = () => {
 									type="button"
 									key={num}
 									disabled={completed}
-									onClick={() => handleNumberInput(num)}
+									onClick={() => handleNumberClick(num)}
 									className={`border rounded-2xl h-14 flex items-center justify-center font-hanken text-2xl font-bold transition-all shadow-sm active:scale-95 ${
 										completed
 											? 'bg-transparent border-transparent text-slate-300 opacity-20'
@@ -471,7 +490,7 @@ const GameScreen: React.FC = () => {
 									type="button"
 									key={num}
 									disabled={completed}
-									onClick={() => handleNumberInput(num)}
+									onClick={() => handleNumberClick(num)}
 									className={`border rounded-2xl h-14 flex items-center justify-center font-hanken text-2xl font-bold transition-all shadow-sm active:scale-95 ${
 										completed
 											? 'bg-transparent border-transparent text-slate-300 opacity-20'
@@ -506,14 +525,20 @@ const GameScreen: React.FC = () => {
 						<div className="flex gap-3">
 							<button
 								type="button"
-								onClick={applyHint}
+								onClick={() => {
+									vibrate(50);
+									applyHint();
+								}}
 								className="flex-1 bg-primary-text text-white py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform shadow-md"
 							>
 								{t('hints.apply')}
 							</button>
 							<button
 								type="button"
-								onClick={clearHint}
+								onClick={() => {
+									vibrate(50);
+									clearHint();
+								}}
 								className="flex-1 border border-border text-secondary py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform"
 							>
 								{t('hints.close')}
