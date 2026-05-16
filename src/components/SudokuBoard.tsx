@@ -66,7 +66,7 @@ const SudokuBoard: React.FC = () => {
 										isVictory
 											? 'bg-transparent'
 											: isAnimating(r, c)
-												? 'bg-[#fcdeb5] shadow-[0_0_20px_rgba(252,222,181,0.6)] z-20 transition-all duration-300 scale-105'
+												? 'bg-[#fcdeb5] border border-[#dec29a] shadow-[0_0_20px_rgba(252,222,181,0.6)] z-20 transition-all duration-300 scale-105'
 												: isHintCell(r, c)
 													? 'bg-yellow-100 animate-pulse'
 													: isSelected(r, c)
