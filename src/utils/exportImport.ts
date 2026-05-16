@@ -1,4 +1,5 @@
 import { db } from '../db/database';
+import { isValidBackup } from './schemas';
 
 export const exportDatabaseToJson = async () => {
 	try {
@@ -37,13 +38,8 @@ export const importDatabaseFromJson = async (file: File) => {
 		const text = await file.text();
 		const data = JSON.parse(text);
 
-		// Basic validation
-		if (
-			data.appName !== 'SUDOKUPADO' ||
-			!Array.isArray(data.players) ||
-			!Array.isArray(data.history)
-		) {
-			throw new Error('Invalid backup file format');
+		if (!isValidBackup(data)) {
+			throw new Error('Invalid or corrupted backup file');
 		}
 
 		// Use a transaction to ensure data integrity

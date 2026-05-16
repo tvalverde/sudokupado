@@ -1,4 +1,5 @@
 import type React from 'react';
+import { useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 
 const SudokuBoard: React.FC = () => {
@@ -12,7 +13,18 @@ const SudokuBoard: React.FC = () => {
 		lastGameResult,
 		currentHint,
 		activeAnimations,
+		clearActiveAnimations,
 	} = useGameStore();
+
+	useEffect(() => {
+		const hasAnimation =
+			activeAnimations.rows.length > 0 ||
+			activeAnimations.cols.length > 0 ||
+			activeAnimations.blocks.length > 0;
+		if (!hasAnimation) return;
+		const timeoutId = setTimeout(clearActiveAnimations, 1000);
+		return () => clearTimeout(timeoutId);
+	}, [activeAnimations, clearActiveAnimations]);
 
 	const isSelected = (r: number, c: number) => selectedCell?.r === r && selectedCell?.c === c;
 	const isHintCell = (r: number, c: number) => currentHint?.r === r && currentHint?.c === c;

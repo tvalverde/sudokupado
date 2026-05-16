@@ -144,6 +144,11 @@ export const translations = {
 				'Achieved your first victory! Install the app on your home screen for a better, full-screen, and offline experience.',
 			button: 'INSTALL NOW',
 			later: 'Not now',
+			ios_button: 'Install App',
+			ios_title: 'Add to Home Screen',
+			ios_step1: 'Tap the Share button (□↑) at the bottom of your browser.',
+			ios_step2: "Select 'Add to Home Screen' from the menu.",
+			ios_close: 'Got it',
 		},
 		pwa: {
 			ready: 'App Ready Offline',
@@ -300,6 +305,11 @@ export const translations = {
 				'¡Has logrado tu primera victoria! Instala la aplicación para una mejor experiencia a pantalla completa y offline.',
 			button: 'INSTALAR AHORA',
 			later: 'Ahora no',
+			ios_button: 'Instalar App',
+			ios_title: 'Añadir a la pantalla de inicio',
+			ios_step1: 'Pulsa el botón Compartir (□↑) en la parte inferior del navegador.',
+			ios_step2: "Selecciona 'Añadir a la pantalla de inicio' en el menú.",
+			ios_close: 'Entendido',
 		},
 		pwa: {
 			ready: 'App lista offline',

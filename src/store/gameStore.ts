@@ -84,6 +84,7 @@ interface GameStore {
 	isNumberCompleted: (num: number) => boolean;
 	useHint: (logicalHint: HintResult) => void;
 	clearHint: () => void;
+	clearActiveAnimations: () => void;
 	applyHint: () => void;
 	eraseCell: (r: number, c: number) => void;
 }
@@ -112,9 +113,6 @@ const DEFAULT_PREFS = {
 	allowNotes: true,
 	maxMistakes: 3,
 };
-
-// Module-scoped variable to track the animation timeout
-let animationTimeout: any = null;
 
 export const useGameStore = create<GameStore>()(
 	persist(
@@ -366,14 +364,6 @@ export const useGameStore = create<GameStore>()(
 							: { rows: [], cols: [], blocks: [] },
 					});
 
-					if (hasNewAnimation) {
-						if (animationTimeout) clearTimeout(animationTimeout);
-						animationTimeout = setTimeout(() => {
-							set({ activeAnimations: { rows: [], cols: [], blocks: [] } });
-							animationTimeout = null;
-						}, 1000);
-					}
-
 					return { isCorrect: true, isFinished };
 				} else {
 					cleanGrid[r][c] = val; // Temporarily show the error on the board
@@ -443,6 +433,8 @@ export const useGameStore = create<GameStore>()(
 					});
 				}
 			},
+
+			clearActiveAnimations: () => set({ activeAnimations: { rows: [], cols: [], blocks: [] } }),
 
 			clearHint: () => set({ currentHint: null }),
 

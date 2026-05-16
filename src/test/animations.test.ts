@@ -1,5 +1,5 @@
 import { act } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useGameStore } from '../store/gameStore';
 
 describe('SudokuBoard Animations', () => {
@@ -38,13 +38,10 @@ describe('SudokuBoard Animations', () => {
 		expect(useGameStore.getState().activeAnimations.rows).toContain(0);
 	});
 
-	it('should clear animation state after 1 second', async () => {
-		vi.useFakeTimers();
+	it('should clear animation state when clearActiveAnimations is called', () => {
 		const store = useGameStore.getState();
 
-		// Complete a row naturally
 		act(() => {
-			// Fill row 0
 			for (let c = 0; c < 9; c++) {
 				store.setCellValue(0, c, 1);
 			}
@@ -52,12 +49,13 @@ describe('SudokuBoard Animations', () => {
 
 		expect(useGameStore.getState().activeAnimations.rows).toContain(0);
 
-		// Advance time
 		act(() => {
-			vi.advanceTimersByTime(1100);
+			useGameStore.getState().clearActiveAnimations();
 		});
 
-		expect(useGameStore.getState().activeAnimations.rows).toHaveLength(0);
-		vi.useRealTimers();
+		const { activeAnimations } = useGameStore.getState();
+		expect(activeAnimations.rows).toHaveLength(0);
+		expect(activeAnimations.cols).toHaveLength(0);
+		expect(activeAnimations.blocks).toHaveLength(0);
 	});
 });
