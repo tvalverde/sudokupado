@@ -77,14 +77,22 @@ describe('GameStore Logic & Regression', () => {
 	it('should correctly resume a saved game (Regression for white screen bug)', () => {
 		const { resumeGame } = useGameStore.getState();
 		const savedState = {
+			playerId: 1,
 			grid: [[1]],
 			initialGrid: [[1]],
 			solution: [[1]],
-			notes: [[[]]],
+			notes: Array(9)
+				.fill(null)
+				.map(() =>
+					Array(9)
+						.fill(null)
+						.map(() => []),
+				) as number[][][],
 			mistakes: 0,
 			hintsUsed: 0,
 			timeElapsed: 10,
-			difficulty: 'expert',
+			isPaused: true,
+			difficulty: 'expert' as const,
 		};
 
 		resumeGame(savedState);

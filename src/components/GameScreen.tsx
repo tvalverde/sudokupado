@@ -30,9 +30,12 @@ const GameScreen: React.FC = () => {
 		isNumberCompleted,
 		restartGame,
 		showDialog,
+		eraseCell,
+		maxMistakes,
+		clearSavedGame,
 	} = useGameStore();
 
-	const wakeLockRef = useRef<any>(null);
+	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 	const isVictory = !!lastGameResult;
 
 	// Native APIs: Wake Lock & Fullscreen & Back Button
@@ -40,10 +43,11 @@ const GameScreen: React.FC = () => {
 		const requestWakeLock = async () => {
 			try {
 				if ('wakeLock' in navigator) {
-					wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+					wakeLockRef.current = await navigator.wakeLock.request('screen');
 				}
-			} catch (err: any) {
-				console.error(`${err.name}, ${err.message}`);
+			} catch (err) {
+				const error = err as Error;
+				console.error(`${error.name}, ${error.message}`);
 			}
 		};
 
@@ -112,6 +116,27 @@ const GameScreen: React.FC = () => {
 
 				if (!isCorrect) {
 					if (navigator.vibrate) navigator.vibrate(200);
+
+					if (mistakes + 1 >= maxMistakes) {
+						setPaused(true);
+						showDialog({
+							title: t('game.game_over_title'),
+							message: t('game.game_over_msg'),
+							type: 'danger',
+							confirmText: t('game.game_over_restart'),
+							cancelText: t('game.game_over_home'),
+							onConfirm: restartGame,
+							onCancel: async () => {
+								const playerId = activePlayerId ?? 0;
+								const existing = await db.gameState.where('playerId').equals(playerId).first();
+								if (existing?.id) await db.gameState.delete(existing.id);
+
+								clearSavedGame();
+								setScreen('main');
+							},
+						});
+						return;
+					}
 				}
 
 				if (isFinished) {
@@ -131,9 +156,11 @@ const GameScreen: React.FC = () => {
 							timeElapsed,
 							date: Date.now(),
 						});
-						const existing = await db.gameState.where('playerId').equals(activePlayerId).first();
-						if (existing?.id) await db.gameState.delete(existing.id);
 					}
+
+					const playerId = activePlayerId ?? 0;
+					const existing = await db.gameState.where('playerId').equals(playerId).first();
+					if (existing?.id) await db.gameState.delete(existing.id);
 
 					setLastGameResult(result);
 
@@ -157,6 +184,12 @@ const GameScreen: React.FC = () => {
 			activePlayerId,
 			setLastGameResult,
 			setScreen,
+			maxMistakes,
+			clearSavedGame,
+			setPaused,
+			showDialog,
+			restartGame,
+			t,
 		],
 	);
 
@@ -229,6 +262,12 @@ const GameScreen: React.FC = () => {
 			cancelText: 'CONTINUE PLAYING',
 			type: 'info',
 		});
+	};
+
+	const handleErase = () => {
+		if (selectedCell) {
+			eraseCell(selectedCell.r, selectedCell.c);
+		}
 	};
 
 	return (
@@ -343,6 +382,7 @@ const GameScreen: React.FC = () => {
 				>
 					<button
 						type="button"
+						onClick={handleErase}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg transition-all active:scale-95"
 					>
 						<Eraser className="w-5 h-5 mb-1" />

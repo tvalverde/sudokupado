@@ -77,11 +77,11 @@ const RulesScreen: React.FC = () => {
 						{t('rules.scoring_title')}
 					</h3>
 					<ul className="font-sans text-xs text-secondary space-y-2 list-disc pl-4">
-						<li>Base points depend on difficulty (2000 to 8000).</li>
-						<li>-1 point for every second elapsed.</li>
-						<li>-200 points for every mistake made.</li>
-						<li>Penalties apply for using hints.</li>
-						<li>Minimum score is always 0.</li>
+						<li>{t('rules.scoring_base')}</li>
+						<li>{t('rules.scoring_time')}</li>
+						<li>{t('rules.scoring_mistakes')}</li>
+						<li>{t('rules.scoring_hints')}</li>
+						<li>{t('rules.scoring_min')}</li>
 					</ul>
 				</section>
 			</main>

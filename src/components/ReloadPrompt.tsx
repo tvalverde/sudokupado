@@ -13,8 +13,8 @@ function ReloadPrompt() {
 		onRegistered(r: ServiceWorkerRegistration | undefined) {
 			console.log(`SW Registered: ${r}`);
 		},
-		onRegisterError(error: any) {
-			console.log('SW registration error', error);
+		onRegisterError(error: unknown) {
+			console.error('SW registration error', error);
 		},
 	});
 

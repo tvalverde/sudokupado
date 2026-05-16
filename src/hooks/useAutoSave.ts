@@ -17,10 +17,10 @@ export const useAutoSave = () => {
 		const currentState = stateRef.current;
 		const { activePlayerId, activeScreen } = currentState;
 
-		// Only auto-save if we are in the game screen and have an active player
-		// If force is true, we allow saving even if the current screen is not 'game' (e.g. just left it)
-		if (!activePlayerId) return;
+		// We allow guest (activePlayerId === null) to be saved using ID 0
 		if (!force && activeScreen !== 'game') return;
+
+		const playerId = activePlayerId ?? 0;
 
 		// Create a snapshot of the current state to detect changes
 		const stateSnapshot = JSON.stringify({
@@ -36,10 +36,10 @@ export const useAutoSave = () => {
 		if (!force && stateSnapshot === lastSavedStateRef.current) return;
 
 		try {
-			const existing = await db.gameState.where('playerId').equals(activePlayerId).first();
+			const existing = await db.gameState.where('playerId').equals(playerId).first();
 
 			const data = {
-				playerId: activePlayerId,
+				playerId: playerId,
 				grid: currentState.grid,
 				initialGrid: currentState.initialGrid,
 				solution: currentState.solution,

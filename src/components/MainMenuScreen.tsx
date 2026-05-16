@@ -52,7 +52,10 @@ const MainMenuScreen: React.FC = () => {
 
 	const savedGame = useLiveQuery(
 		() =>
-			activePlayerId ? db.gameState.where('playerId').equals(activePlayerId).first() : undefined,
+			db.gameState
+				.where('playerId')
+				.equals(activePlayerId ?? 0)
+				.first(),
 		[activePlayerId],
 	);
 

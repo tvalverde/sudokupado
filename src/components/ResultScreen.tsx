@@ -4,13 +4,24 @@ import { Home, Play, Trophy, User } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { db } from '../db/database';
+import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
 import Button from './Button';
 import InstallModal from './InstallModal';
 
 const ResultScreen: React.FC = () => {
-	const { lastGameResult, setScreen, activePlayerId, deferredPrompt, t } = useGameStore();
+	const {
+		lastGameResult,
+		setScreen,
+		activePlayerId,
+		deferredPrompt,
+		t,
+		initGame,
+		selectedDifficulty,
+	} = useGameStore();
 	const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const { generatePuzzle } = useSudokuWorker();
 
 	const topScores = useLiveQuery(async () => {
 		if (!lastGameResult) return [];
@@ -53,6 +64,18 @@ const ResultScreen: React.FC = () => {
 		const mins = Math.floor(seconds / 60);
 		const secs = seconds % 60;
 		return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+	};
+
+	const handleNewGame = async () => {
+		setIsLoading(true);
+		try {
+			const { initialGrid, solution } = await generatePuzzle(selectedDifficulty);
+			initGame(initialGrid, solution, selectedDifficulty);
+		} catch (error) {
+			console.error('Failed to generate puzzle:', error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -142,10 +165,42 @@ const ResultScreen: React.FC = () => {
 					variant="primary"
 					size="lg"
 					className="w-full gap-2"
-					onClick={() => setScreen('game')}
+					onClick={handleNewGame}
+					disabled={isLoading}
 				>
-					<Play className="w-5 h-5 fill-current" />
-					{t('result.new_game')}
+					{isLoading ? (
+						<div className="flex items-center justify-center gap-3">
+							<svg
+								className="w-5 h-5 animate-spin"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-labelledby="generating-title"
+								role="img"
+							>
+								<title id="generating-title">{t('main_menu.generating_label')}</title>
+								<circle
+									className="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									strokeWidth="4"
+								/>
+								<path
+									className="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								/>
+							</svg>
+							<span className="animate-pulse">{t('main_menu.generating_label')}</span>
+						</div>
+					) : (
+						<>
+							<Play className="w-5 h-5 fill-current" />
+							{t('result.new_game')}
+						</>
+					)}
 				</Button>
 				<Button
 					variant="secondary"

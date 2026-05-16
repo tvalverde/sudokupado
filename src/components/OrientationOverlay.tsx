@@ -2,8 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Smartphone } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { useGameStore } from '../store/gameStore';
 
 const OrientationOverlay: React.FC = () => {
+	const { t } = useGameStore();
 	const [isLandscape, setIsLandscape] = useState(false);
 
 	useEffect(() => {
@@ -36,11 +38,11 @@ const OrientationOverlay: React.FC = () => {
 					</motion.div>
 
 					<h2 className="font-hanken text-2xl font-extrabold text-primary-text uppercase tracking-widest-premium mb-4">
-						Portrait Mode Only
+						{t('orientation.title')}
 					</h2>
 
 					<p className="font-sans text-secondary text-sm leading-relaxed max-w-xs">
-						Please rotate your device back to portrait mode to enjoy the best Zen Sudoku experience.
+						{t('orientation.message')}
 					</p>
 				</motion.div>
 			)}

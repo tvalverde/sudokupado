@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { db } from '../db/database';
-import type { Difficulty, ScreenType } from '../types';
+import type { Difficulty, GameState, ScreenType } from '../types';
 import { translations } from '../utils/translations';
 
 export interface GameResult {
@@ -42,9 +42,9 @@ interface GameStore {
 	setAllowNotes: (allow: boolean) => void;
 	setMaxMistakes: (max: number) => void;
 	setLastGameResult: (result: GameResult | null) => void;
-	setDeferredPrompt: (prompt: any) => void;
+	setDeferredPrompt: (prompt: BeforeInstallPromptEvent | null) => void;
 	setLanguage: (lang: Language) => void;
-	t: (path: string) => any;
+	t: (path: string) => string;
 	showDialog: (config: Omit<DialogState, 'isOpen'>) => void;
 	closeDialog: () => void;
 
@@ -59,11 +59,11 @@ interface GameStore {
 	isPaused: boolean;
 	selectedCell: { r: number; c: number } | null;
 	isNoteMode: boolean;
-	deferredPrompt: any | null;
+	deferredPrompt: BeforeInstallPromptEvent | null;
 
 	// Game Play Actions
 	initGame: (initial: number[][], solution: number[][], difficulty: Difficulty) => void;
-	resumeGame: (savedState: any) => void;
+	resumeGame: (savedState: GameState) => void;
 	restartGame: () => void;
 	clearSavedGame: () => void;
 	setCellValue: (r: number, c: number, val: number) => { isCorrect: boolean; isFinished: boolean };
@@ -74,6 +74,7 @@ interface GameStore {
 	setPaused: (paused: boolean) => void;
 	isNumberCompleted: (num: number) => boolean;
 	useHint: () => void;
+	eraseCell: (r: number, c: number) => void;
 }
 
 const emptyGrid = () =>
@@ -189,14 +190,19 @@ export const useGameStore = create<GameStore>()(
 			showDialog: (config) => set({ dialog: { ...config, isOpen: true } }),
 			closeDialog: () => set((state) => ({ dialog: { ...state.dialog, isOpen: false } })),
 
-			t: (path: string) => {
+			t: (path: string): string => {
 				const lang = get().language;
 				const keys = path.split('.');
-				let value: any = translations[lang];
+				let value: unknown = translations[lang];
 				for (const key of keys) {
-					value = value?.[key];
+					if (typeof value === 'object' && value !== null && key in value) {
+						value = (value as Record<string, unknown>)[key];
+					} else {
+						value = undefined;
+						break;
+					}
 				}
-				return value || path;
+				return typeof value === 'string' ? value : path;
 			},
 
 			initGame: (initial, solution, difficulty) =>
@@ -355,6 +361,17 @@ export const useGameStore = create<GameStore>()(
 					grid: newGrid,
 					hintsUsed: state.hintsUsed + 1,
 				});
+			},
+
+			eraseCell: (r, c) => {
+				const state = get();
+				// Solo borrar si la celda no es parte del puzzle inicial
+				if (state.initialGrid[r][c] !== 0) return;
+
+				const newGrid = state.grid.map((row) => [...row]);
+				newGrid[r][c] = 0;
+
+				set({ grid: newGrid });
 			},
 		}),
 		{

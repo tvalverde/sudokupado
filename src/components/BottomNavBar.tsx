@@ -1,11 +1,12 @@
-import { HelpCircle, LayoutGrid, Trophy } from 'lucide-react';
+import { HelpCircle, LayoutGrid, type LucideIcon, Trophy } from 'lucide-react';
 import type React from 'react';
 import { useGameStore } from '../store/gameStore';
+import type { ScreenType } from '../types';
 
 const BottomNavBar: React.FC = () => {
 	const { activeScreen, setScreen, t } = useGameStore();
 
-	const navItems = [
+	const navItems: { id: ScreenType; label: string; icon: LucideIcon }[] = [
 		{ id: 'main', label: t('main_menu.play_button'), icon: LayoutGrid },
 		{ id: 'trophies', label: t('trophies.title'), icon: Trophy },
 		{ id: 'rules', label: t('rules.title'), icon: HelpCircle },
@@ -21,7 +22,7 @@ const BottomNavBar: React.FC = () => {
 					return (
 						<button
 							key={item.id}
-							onClick={() => setScreen(item.id as any)}
+							onClick={() => setScreen(item.id)}
 							className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${
 								isActive ? 'text-primary-text' : 'text-secondary hover:text-primary-text'
 							}`}

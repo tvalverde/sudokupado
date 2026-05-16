@@ -87,7 +87,7 @@ describe('PWA Integration Tests', () => {
 			const mockPrompt = {
 				prompt: vi.fn(),
 				userChoice: Promise.resolve({ outcome: 'dismissed' }),
-			};
+			} as unknown as BeforeInstallPromptEvent;
 			useGameStore.getState().setDeferredPrompt(mockPrompt);
 
 			render(React.createElement(InstallModal, { isOpen: true, onClose: vi.fn() }));
@@ -108,7 +108,7 @@ describe('PWA Integration Tests', () => {
 			const mockPrompt = {
 				prompt: vi.fn(),
 				userChoice: Promise.resolve({ outcome: 'accepted' }),
-			};
+			} as unknown as BeforeInstallPromptEvent;
 			useGameStore.getState().setDeferredPrompt(mockPrompt);
 			const onClose = vi.fn();
 
@@ -129,7 +129,7 @@ describe('PWA Integration Tests', () => {
 			const mockPrompt = {
 				prompt: vi.fn(),
 				userChoice: Promise.resolve({ outcome: 'dismissed' }),
-			};
+			} as unknown as BeforeInstallPromptEvent;
 			useGameStore.getState().setDeferredPrompt(mockPrompt);
 			const onClose = vi.fn();
 
@@ -149,10 +149,10 @@ describe('PWA Integration Tests', () => {
 
 	describe('Global PWA events', () => {
 		it('should store deferredPrompt when beforeinstallprompt fires', () => {
-			const event = new Event('beforeinstallprompt') as any;
-			event.preventDefault = vi.fn();
-
-			window.dispatchEvent(event);
+			const event = new Event('beforeinstallprompt') as unknown as BeforeInstallPromptEvent;
+			// mock prompt to avoid runtime error if called
+			(event as any).prompt = vi.fn();
+			(event as any).userChoice = Promise.resolve({ outcome: 'accepted' });
 
 			// Since main.tsx handles this, and main.tsx is not executed in these tests automatically
 			// unless we import it (which has side effects like ReactDOM.render).

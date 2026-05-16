@@ -38,6 +38,10 @@ export const translations = {
 			paused: 'Game Paused',
 			resume: 'Tap to resume',
 			victory: 'VICTORY!',
+			game_over_title: 'Game Over',
+			game_over_msg: 'You have reached the maximum number of mistakes.',
+			game_over_restart: 'RESTART PUZZLE',
+			game_over_home: 'MAIN MENU',
 			restart_prompt_title: 'Restart Puzzle',
 			restart_prompt_msg:
 				'Are you sure you want to clear your progress and start this puzzle over?',
@@ -110,6 +114,16 @@ export const translations = {
 			hidden_singles_text:
 				'When a candidate is the only one of its kind in a row, column, or 3x3 block.',
 			scoring_title: 'Scoring System',
+			scoring_base: 'Base points depend on difficulty (2000 to 8000).',
+			scoring_time: '-1 point for every second elapsed.',
+			scoring_mistakes: '-200 points for every mistake made.',
+			scoring_hints: 'Penalties apply for using hints.',
+			scoring_min: 'Minimum score is always 0.',
+		},
+		orientation: {
+			title: 'Portrait Mode Only',
+			message:
+				'Please rotate your device back to portrait mode to enjoy the best Zen Sudoku experience.',
 		},
 		install: {
 			title: 'Install Sudokupado',
@@ -166,6 +180,10 @@ export const translations = {
 			paused: 'Partida Pausada',
 			resume: 'Toca para continuar',
 			victory: '¡VICTORIA!',
+			game_over_title: 'Fin de la Partida',
+			game_over_msg: 'Has alcanzado el límite máximo de errores permitidos.',
+			game_over_restart: 'REINICIAR TABLERO',
+			game_over_home: 'VOLVER AL MENÚ',
 			restart_prompt_title: 'Reiniciar Sudoku',
 			restart_prompt_msg:
 				'¿Estás seguro de que deseas borrar tu progreso y empezar este Sudoku desde cero?',
@@ -238,6 +256,16 @@ export const translations = {
 			hidden_singles_text:
 				'Cuando un candidato es el único de su clase en una fila, columna o bloque de 3x3.',
 			scoring_title: 'Sistema de Puntuación',
+			scoring_base: 'Puntos base según dificultad (2000 a 8000).',
+			scoring_time: '-1 punto por cada segundo transcurrido.',
+			scoring_mistakes: '-200 puntos por cada error cometido.',
+			scoring_hints: 'Se aplican penalizaciones por usar pistas.',
+			scoring_min: 'La puntuación mínima es siempre 0.',
+		},
+		orientation: {
+			title: 'Solo Modo Retrato',
+			message:
+				'Por favor, gira tu dispositivo a modo vertical para disfrutar de la mejor experiencia Zen Sudoku.',
 		},
 		install: {
 			title: 'Instalar Sudokupado',

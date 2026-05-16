@@ -8,24 +8,22 @@ import { useGameStore } from '../store/gameStore';
 import type { Difficulty } from '../types';
 
 const TrophiesScreen: React.FC = () => {
-	const { setScreen, activePlayerId, t } = useGameStore();
+	const { setScreen, t } = useGameStore();
 	const [filterDifficulty, setFilterDifficulty] = useState<Difficulty | 'all'>('all');
 
 	const history = useLiveQuery(async () => {
-		let query = db.history.where('id').above(0);
-		if (activePlayerId) {
-			query = db.history.where('playerId').equals(activePlayerId);
-		}
-		const results = await query.toArray();
+		const results = await db.history.toArray();
+		const players = await db.players.toArray();
+		const playerMap = new Map(players.map((p) => [p.id, p.name]));
+
 		return results
+			.map((entry) => ({
+				...entry,
+				playerName: playerMap.get(entry.playerId) || 'Player',
+			}))
 			.filter((entry) => filterDifficulty === 'all' || entry.difficulty === filterDifficulty)
 			.sort((a, b) => b.date - a.date);
-	}, [activePlayerId, filterDifficulty]);
-
-	const activePlayer = useLiveQuery(
-		() => (activePlayerId ? db.players.get(activePlayerId) : undefined),
-		[activePlayerId],
-	);
+	}, [filterDifficulty]);
 
 	const difficulties: Difficulty[] = ['beginner', 'intermediate', 'expert', 'master'];
 
@@ -110,7 +108,7 @@ const TrophiesScreen: React.FC = () => {
 						>
 							<div className="flex justify-between items-start border-b border-border pb-2">
 								<span className="font-sans text-sm font-bold text-primary-text">
-									{activePlayer?.name || 'Player'}
+									{entry.playerName}
 								</span>
 								<span className="font-sans text-xs text-secondary">{formatDate(entry.date)}</span>
 							</div>
