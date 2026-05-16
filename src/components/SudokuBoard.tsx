@@ -11,11 +11,21 @@ const SudokuBoard: React.FC = () => {
 		solution,
 		lastGameResult,
 		currentHint,
+		activeAnimations,
 	} = useGameStore();
 
 	const isSelected = (r: number, c: number) => selectedCell?.r === r && selectedCell?.c === c;
 	const isHintCell = (r: number, c: number) => currentHint?.r === r && currentHint?.c === c;
 	const isVictory = !!lastGameResult;
+
+	const isAnimating = (r: number, c: number) => {
+		const blockIdx = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+		return (
+			activeAnimations.rows.includes(r) ||
+			activeAnimations.cols.includes(c) ||
+			activeAnimations.blocks.includes(blockIdx)
+		);
+	};
 
 	const isSameGroup = (r: number, c: number) => {
 		if (!selectedCell || isVictory) return false;
@@ -55,15 +65,17 @@ const SudokuBoard: React.FC = () => {
                   ${
 										isVictory
 											? 'bg-transparent'
-											: isHintCell(r, c)
-												? 'bg-yellow-100 animate-pulse'
-												: isSelected(r, c)
-													? 'bg-slate-200'
-													: isSameNumber(r, c)
-														? 'bg-blue-100'
-														: isSameGroup(r, c)
-															? 'bg-subtle-bg'
-															: 'bg-white'
+											: isAnimating(r, c)
+												? 'bg-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.6)] z-20 transition-all duration-300 scale-105'
+												: isHintCell(r, c)
+													? 'bg-yellow-100 animate-pulse'
+													: isSelected(r, c)
+														? 'bg-slate-200'
+														: isSameNumber(r, c)
+															? 'bg-blue-100'
+															: isSameGroup(r, c)
+																? 'bg-subtle-bg'
+																: 'bg-white'
 									}
                   ${isError ? 'animate-shake' : ''}
                   ${isVictory ? 'pointer-events-none' : 'cursor-pointer'}

@@ -62,6 +62,11 @@ interface GameStore {
 	isNoteMode: boolean;
 	deferredPrompt: BeforeInstallPromptEvent | null;
 	currentHint: HintResult | null;
+	activeAnimations: {
+		rows: number[];
+		cols: number[];
+		blocks: number[];
+	};
 
 	// Game Play Actions
 	initGame: (initial: number[][], solution: number[][], difficulty: Difficulty) => void;
@@ -135,6 +140,7 @@ export const useGameStore = create<GameStore>()(
 			isNoteMode: false,
 			deferredPrompt: null,
 			currentHint: null,
+			activeAnimations: { rows: [], cols: [], blocks: [] },
 
 			setScreen: (screen) => set({ activeScreen: screen }),
 
@@ -307,7 +313,51 @@ export const useGameStore = create<GameStore>()(
 						row.every((cell, ci) => cell === state.solution[ri][ci]),
 					);
 
-					set({ grid: newGrid, notes: newNotes });
+					// Check for row/col/block completion animations
+					const completedRows = [];
+					const completedCols = [];
+					const completedBlocks = [];
+
+					if (newGrid[r].every((cell, ci) => cell === state.solution[r][ci])) {
+						completedRows.push(r);
+					}
+					if (newGrid.every((row, ri) => row[c] === state.solution[ri][c])) {
+						completedCols.push(c);
+					}
+
+					// Only check block completion for standard 9x9 grids
+					if (newGrid.length === 9 && newGrid[0].length === 9) {
+						const br = Math.floor(r / 3) * 3;
+						const bc = Math.floor(c / 3) * 3;
+						let blockComplete = true;
+						for (let i = 0; i < 3; i++) {
+							for (let j = 0; j < 3; j++) {
+								if (newGrid[br + i][bc + j] !== state.solution[br + i][bc + j]) {
+									blockComplete = false;
+									break;
+								}
+							}
+						}
+						if (blockComplete) completedBlocks.push(Math.floor(r / 3) * 3 + Math.floor(c / 3));
+					}
+
+					const hasNewAnimation =
+						completedRows.length > 0 || completedCols.length > 0 || completedBlocks.length > 0;
+
+					set({
+						grid: newGrid,
+						notes: newNotes,
+						activeAnimations: hasNewAnimation
+							? { rows: completedRows, cols: completedCols, blocks: completedBlocks }
+							: { rows: [], cols: [], blocks: [] },
+					});
+
+					if (hasNewAnimation) {
+						setTimeout(() => {
+							set({ activeAnimations: { rows: [], cols: [], blocks: [] } });
+						}, 1000);
+					}
+
 					return { isCorrect: true, isFinished };
 				} else {
 					set({ mistakes: state.mistakes + 1 });

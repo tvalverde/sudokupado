@@ -274,7 +274,8 @@ export const translations = {
 		},
 		hints: {
 			title: 'PISTA LÓGICA',
-			naked_single: 'En esta celda solo puede ir el número {num} porque es el único candidato posible.',
+			naked_single:
+				'En esta celda solo puede ir el número {num} porque es el único candidato posible.',
 			hidden_single_row: 'En esta fila, el número {num} solo puede ir en esta posición.',
 			hidden_single_col: 'En esta columna, el número {num} solo puede ir en esta posición.',
 			hidden_single_block: 'En este bloque 3x3, el número {num} solo puede ir en esta posición.',

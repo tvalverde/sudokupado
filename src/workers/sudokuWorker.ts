@@ -13,7 +13,12 @@ export interface HintResult {
 	r: number;
 	c: number;
 	value: number;
-	type: 'naked_single' | 'hidden_single_row' | 'hidden_single_col' | 'hidden_single_block' | 'fallback';
+	type:
+		| 'naked_single'
+		| 'hidden_single_row'
+		| 'hidden_single_col'
+		| 'hidden_single_block'
+		| 'fallback';
 }
 
 type DifficultyLevel = 'beginner' | 'intermediate' | 'expert' | 'master';
