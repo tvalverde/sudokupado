@@ -282,7 +282,7 @@ const GameScreen: React.FC = () => {
 	};
 
 	const handleRestartClick = () => {
-		vibrate(50);
+		vibrate(10);
 		showDialog({
 			title: 'Restart Puzzle',
 			message: 'Are you sure you want to clear your progress and start this puzzle over?',
@@ -294,14 +294,14 @@ const GameScreen: React.FC = () => {
 	};
 
 	const handleErase = () => {
-		vibrate(50);
+		vibrate(10);
 		if (selectedCell) {
 			eraseCell(selectedCell.r, selectedCell.c);
 		}
 	};
 
 	const handleNumberClick = (num: number) => {
-		vibrate(50);
+		vibrate(10);
 		handleNumberInput(num);
 	};
 
@@ -426,7 +426,7 @@ const GameScreen: React.FC = () => {
 					<button
 						type="button"
 						onClick={() => {
-							vibrate(50);
+							vibrate(10);
 							setNoteMode(!isNoteMode);
 						}}
 						className={`flex flex-col items-center justify-center py-3 rounded-xl transition-all active:scale-95 ${
@@ -443,7 +443,7 @@ const GameScreen: React.FC = () => {
 					<button
 						type="button"
 						onClick={async () => {
-							vibrate(50);
+							vibrate(10);
 							if (hintsUsed >= 3 || currentHint) return;
 
 							// Clear errors before sending grid to worker
@@ -546,7 +546,7 @@ const GameScreen: React.FC = () => {
 							<button
 								type="button"
 								onClick={() => {
-									vibrate(50);
+									vibrate(10);
 									applyHint();
 								}}
 								className="flex-1 bg-primary-text text-white py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform shadow-md"
@@ -556,7 +556,7 @@ const GameScreen: React.FC = () => {
 							<button
 								type="button"
 								onClick={() => {
-									vibrate(50);
+									vibrate(10);
 									clearHint();
 								}}
 								className="flex-1 border border-border text-secondary py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform"
