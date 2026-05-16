@@ -71,12 +71,20 @@ const GameScreen: React.FC = () => {
 		window.history.pushState(null, '', window.location.pathname);
 		window.addEventListener('popstate', handlePopState);
 
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === 'hidden') {
+				setPaused(true);
+			}
+		};
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
 		return () => {
 			wakeLockRef.current?.release();
 			if (document.fullscreenElement) {
 				document.exitFullscreen().catch(() => {});
 			}
 			window.removeEventListener('popstate', handlePopState);
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
 		};
 	}, [setPaused]);
 
