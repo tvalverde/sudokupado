@@ -9,6 +9,13 @@ export interface SudokuResult {
 	difficulty: string;
 }
 
+export interface HintResult {
+	r: number;
+	c: number;
+	value: number;
+	type: 'naked_single' | 'hidden_single_row' | 'hidden_single_col' | 'hidden_single_block' | 'fallback';
+}
+
 type DifficultyLevel = 'beginner' | 'intermediate' | 'expert' | 'master';
 
 class SudokuEngine {
@@ -612,6 +619,77 @@ class SudokuEngine {
 		}
 
 		return grid;
+	}
+
+	public getLogicalHint(grid: number[][], solution: number[][]): HintResult {
+		const candidates = this.initCandidates(grid);
+
+		// 1. Naked Single
+		for (let r = 0; r < 9; r++) {
+			for (let c = 0; c < 9; c++) {
+				if (grid[r][c] === 0 && candidates[r][c].length === 1) {
+					return {
+						r,
+						c,
+						value: candidates[r][c][0],
+						type: 'naked_single',
+					};
+				}
+			}
+		}
+
+		// 2. Hidden Single
+		for (let n = 1; n <= 9; n++) {
+			for (let i = 0; i < 9; i++) {
+				// Row
+				const rowPositions = [];
+				for (let c = 0; c < 9; c++)
+					if (grid[i][c] === 0 && candidates[i][c].includes(n)) rowPositions.push(c);
+				if (rowPositions.length === 1) {
+					return { r: i, c: rowPositions[0], value: n, type: 'hidden_single_row' };
+				}
+
+				// Col
+				const colPositions = [];
+				for (let r = 0; r < 9; r++)
+					if (grid[r][i] === 0 && candidates[r][i].includes(n)) colPositions.push(r);
+				if (colPositions.length === 1) {
+					return { r: colPositions[0], c: i, value: n, type: 'hidden_single_col' };
+				}
+
+				// Block
+				const blockPositions = [];
+				const br = Math.floor(i / 3) * 3;
+				const bc = (i % 3) * 3;
+				for (let r = 0; r < 3; r++) {
+					for (let c = 0; c < 3; c++) {
+						if (grid[br + r][bc + c] === 0 && candidates[br + r][bc + c].includes(n)) {
+							blockPositions.push({ r: br + r, c: bc + c });
+						}
+					}
+				}
+				if (blockPositions.length === 1) {
+					return {
+						r: blockPositions[0].r,
+						c: blockPositions[0].c,
+						value: n,
+						type: 'hidden_single_block',
+					};
+				}
+			}
+		}
+
+		// 3. Fallback: Find the first empty cell and give solution
+		for (let r = 0; r < 9; r++) {
+			for (let c = 0; c < 9; c++) {
+				if (grid[r][c] === 0) {
+					return { r, c, value: solution[r][c], type: 'fallback' };
+				}
+			}
+		}
+
+		// Should never happen if grid is not full
+		return { r: 0, c: 0, value: 0, type: 'fallback' };
 	}
 }
 

@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { db } from '../db/database';
 import type { Difficulty, GameState, ScreenType } from '../types';
 import { translations } from '../utils/translations';
+import { engine, type HintResult } from '../workers/sudokuWorker';
 
 export interface GameResult {
 	score: number;
@@ -60,6 +61,7 @@ interface GameStore {
 	selectedCell: { r: number; c: number } | null;
 	isNoteMode: boolean;
 	deferredPrompt: BeforeInstallPromptEvent | null;
+	currentHint: HintResult | null;
 
 	// Game Play Actions
 	initGame: (initial: number[][], solution: number[][], difficulty: Difficulty) => void;
@@ -74,6 +76,8 @@ interface GameStore {
 	setPaused: (paused: boolean) => void;
 	isNumberCompleted: (num: number) => boolean;
 	useHint: () => void;
+	clearHint: () => void;
+	applyHint: () => void;
 	eraseCell: (r: number, c: number) => void;
 }
 
@@ -130,6 +134,7 @@ export const useGameStore = create<GameStore>()(
 			selectedCell: null,
 			isNoteMode: false,
 			deferredPrompt: null,
+			currentHint: null,
 
 			setScreen: (screen) => set({ activeScreen: screen }),
 
@@ -348,18 +353,31 @@ export const useGameStore = create<GameStore>()(
 
 			useHint: () => {
 				const state = get();
-				if (state.hintsUsed >= 3 || !state.selectedCell) return;
+				if (state.hintsUsed >= 3 || state.currentHint) return;
 
-				const { r, c } = state.selectedCell;
-				if (state.grid[r][c] !== 0) return;
+				const logicalHint = engine.getLogicalHint(state.grid, state.solution);
+				if (logicalHint) {
+					set({
+						currentHint: logicalHint,
+						selectedCell: { r: logicalHint.r, c: logicalHint.c },
+					});
+				}
+			},
 
-				const correctVal = state.solution[r][c];
+			clearHint: () => set({ currentHint: null }),
+
+			applyHint: () => {
+				const state = get();
+				if (!state.currentHint) return;
+
+				const { r, c, value } = state.currentHint;
 				const newGrid = state.grid.map((row) => [...row]);
-				newGrid[r][c] = correctVal;
+				newGrid[r][c] = value;
 
 				set({
 					grid: newGrid,
 					hintsUsed: state.hintsUsed + 1,
+					currentHint: null,
 				});
 			},
 

@@ -120,6 +120,16 @@ export const translations = {
 			scoring_hints: 'Penalties apply for using hints.',
 			scoring_min: 'Minimum score is always 0.',
 		},
+		hints: {
+			title: 'LOGICAL HINT',
+			naked_single: 'This cell only has one possible candidate: {num}.',
+			hidden_single_row: 'In this row, the number {num} can only fit in this cell.',
+			hidden_single_col: 'In this column, the number {num} can only fit in this cell.',
+			hidden_single_block: 'In this 3x3 block, the number {num} can only fit in this cell.',
+			fallback: 'By advanced elimination, the correct number for this cell is {num}.',
+			apply: 'APPLY HINT',
+			close: 'I GOT IT',
+		},
 		orientation: {
 			title: 'Portrait Mode Only',
 			message:
@@ -261,6 +271,16 @@ export const translations = {
 			scoring_mistakes: '-200 puntos por cada error cometido.',
 			scoring_hints: 'Se aplican penalizaciones por usar pistas.',
 			scoring_min: 'La puntuación mínima es siempre 0.',
+		},
+		hints: {
+			title: 'PISTA LÓGICA',
+			naked_single: 'En esta celda solo puede ir el número {num} porque es el único candidato posible.',
+			hidden_single_row: 'En esta fila, el número {num} solo puede ir en esta posición.',
+			hidden_single_col: 'En esta columna, el número {num} solo puede ir en esta posición.',
+			hidden_single_block: 'En este bloque 3x3, el número {num} solo puede ir en esta posición.',
+			fallback: 'Por eliminación avanzada, el número correcto para esta celda es el {num}.',
+			apply: 'APLICAR PISTA',
+			close: 'ENTENDIDO',
 		},
 		orientation: {
 			title: 'Solo Modo Retrato',

@@ -2,10 +2,19 @@ import type React from 'react';
 import { useGameStore } from '../store/gameStore';
 
 const SudokuBoard: React.FC = () => {
-	const { grid, initialGrid, notes, selectedCell, setSelectedCell, solution, lastGameResult } =
-		useGameStore();
+	const {
+		grid,
+		initialGrid,
+		notes,
+		selectedCell,
+		setSelectedCell,
+		solution,
+		lastGameResult,
+		currentHint,
+	} = useGameStore();
 
 	const isSelected = (r: number, c: number) => selectedCell?.r === r && selectedCell?.c === c;
+	const isHintCell = (r: number, c: number) => currentHint?.r === r && currentHint?.c === c;
 	const isVictory = !!lastGameResult;
 
 	const isSameGroup = (r: number, c: number) => {
@@ -43,7 +52,19 @@ const SudokuBoard: React.FC = () => {
 								onClick={() => !isVictory && setSelectedCell(r, c)}
 								className={`
                   relative flex items-center justify-center font-hanken transition-colors
-                  ${isVictory ? 'bg-transparent' : isSelected(r, c) ? 'bg-slate-200' : isSameNumber(r, c) ? 'bg-blue-100' : isSameGroup(r, c) ? 'bg-subtle-bg' : 'bg-white'}
+                  ${
+										isVictory
+											? 'bg-transparent'
+											: isHintCell(r, c)
+												? 'bg-yellow-100 animate-pulse'
+												: isSelected(r, c)
+													? 'bg-slate-200'
+													: isSameNumber(r, c)
+														? 'bg-blue-100'
+														: isSameGroup(r, c)
+															? 'bg-subtle-bg'
+															: 'bg-white'
+									}
                   ${isError ? 'animate-shake' : ''}
                   ${isVictory ? 'pointer-events-none' : 'cursor-pointer'}
                 `}

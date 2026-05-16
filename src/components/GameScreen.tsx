@@ -33,6 +33,9 @@ const GameScreen: React.FC = () => {
 		eraseCell,
 		maxMistakes,
 		clearSavedGame,
+		currentHint,
+		applyHint,
+		clearHint,
 	} = useGameStore();
 
 	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
@@ -481,6 +484,43 @@ const GameScreen: React.FC = () => {
 					</div>
 				</div>
 			</main>
+
+			<AnimatePresence>
+				{currentHint && (
+					<motion.div
+						initial={{ opacity: 0, y: 50 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: 50 }}
+						className="absolute bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-primary-text p-6 pb-10 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.2)] rounded-t-3xl"
+					>
+						<div className="flex items-center gap-2 mb-3">
+							<Lightbulb className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+							<h3 className="font-hanken text-xs font-black text-primary-text uppercase tracking-widest-premium">
+								{t('hints.title')}
+							</h3>
+						</div>
+						<p className="font-sans text-sm text-secondary leading-relaxed mb-6">
+							{t(`hints.${currentHint.type}`).replace('{num}', currentHint.value.toString())}
+						</p>
+						<div className="flex gap-3">
+							<button
+								type="button"
+								onClick={applyHint}
+								className="flex-1 bg-primary-text text-white py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform shadow-md"
+							>
+								{t('hints.apply')}
+							</button>
+							<button
+								type="button"
+								onClick={clearHint}
+								className="flex-1 border border-border text-secondary py-4 rounded-xl font-hanken text-xs font-bold uppercase tracking-widest active:scale-95 transition-transform"
+							>
+								{t('hints.close')}
+							</button>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</motion.div>
 	);
 };
