@@ -83,11 +83,11 @@ export const useAutoSave = () => {
 
 		const handleVisibilityChange = () => {
 			if (document.visibilityState === 'hidden') {
-				saveGame(true);
+				saveGame();
 			}
 		};
 		const handleBeforeUnload = () => {
-			saveGame(true);
+			saveGame();
 		};
 		window.addEventListener('beforeunload', handleBeforeUnload);
 		document.addEventListener('visibilitychange', handleVisibilityChange);
