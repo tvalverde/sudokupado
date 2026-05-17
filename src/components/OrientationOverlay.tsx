@@ -10,7 +10,6 @@ const OrientationOverlay: React.FC = () => {
 
 	useEffect(() => {
 		const checkOrientation = () => {
-			// Check if width > height and it's likely a mobile device (or just enforce it everywhere for PWA feel)
 			setIsLandscape(window.innerWidth > window.innerHeight && window.innerWidth < 1024);
 		};
 
@@ -19,6 +18,14 @@ const OrientationOverlay: React.FC = () => {
 
 		return () => window.removeEventListener('resize', checkOrientation);
 	}, []);
+
+	useEffect(() => {
+		if (!isLandscape) return;
+		const orientation = screen.orientation as ScreenOrientation & {
+			lock?: (orientation: string) => Promise<void>;
+		};
+		orientation.lock?.('portrait-primary').catch(() => {});
+	}, [isLandscape]);
 
 	return (
 		<AnimatePresence>

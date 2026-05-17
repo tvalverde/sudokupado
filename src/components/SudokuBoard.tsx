@@ -102,7 +102,7 @@ const SudokuBoard: React.FC = () => {
 								{val !== 0 ? (
 									<span
 										className={`
-                    text-4xl transition-colors duration-1000
+                    text-4xl md:text-5xl lg:text-4xl transition-colors duration-1000
                     ${isVictory ? 'text-green-700 font-bold' : isInitial ? 'text-primary-text font-black' : isError ? 'text-error font-bold' : 'text-slate-600 font-bold'}
                   `}
 									>
@@ -113,7 +113,7 @@ const SudokuBoard: React.FC = () => {
 										{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
 											<div
 												key={n}
-												className="flex items-center justify-center text-[12px] md:text-sm font-sans font-bold text-secondary leading-none"
+												className="flex items-center justify-center text-[12px] md:text-base lg:text-[12px] font-sans font-bold text-secondary leading-none"
 											>
 												{!isVictory && cellNotes.includes(n) ? n : ''}
 											</div>
