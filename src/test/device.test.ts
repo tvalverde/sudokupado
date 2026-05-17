@@ -3,10 +3,15 @@ import { isIOS, isStandalone } from '../utils/device';
 
 describe('isIOS', () => {
 	const originalUserAgent = navigator.userAgent;
+	const originalMaxTouchPoints = navigator.maxTouchPoints;
 
 	afterEach(() => {
 		Object.defineProperty(navigator, 'userAgent', {
 			value: originalUserAgent,
+			configurable: true,
+		});
+		Object.defineProperty(navigator, 'maxTouchPoints', {
+			value: originalMaxTouchPoints,
 			configurable: true,
 		});
 	});
@@ -25,6 +30,30 @@ describe('isIOS', () => {
 			configurable: true,
 		});
 		expect(isIOS()).toBe(true);
+	});
+
+	it('returns true for iPadOS 13+ (Mac UA with touch support)', () => {
+		Object.defineProperty(navigator, 'userAgent', {
+			value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X)',
+			configurable: true,
+		});
+		Object.defineProperty(navigator, 'maxTouchPoints', {
+			value: 5,
+			configurable: true,
+		});
+		expect(isIOS()).toBe(true);
+	});
+
+	it('returns false for Mac desktop (Mac UA with no touch support)', () => {
+		Object.defineProperty(navigator, 'userAgent', {
+			value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X)',
+			configurable: true,
+		});
+		Object.defineProperty(navigator, 'maxTouchPoints', {
+			value: 0,
+			configurable: true,
+		});
+		expect(isIOS()).toBe(false);
 	});
 
 	it('returns false for Android user agent', () => {

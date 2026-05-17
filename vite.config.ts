@@ -29,26 +29,23 @@ export default defineConfig({
 				display: 'standalone',
 				orientation: 'portrait',
 				icons: [
+					{ src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+					{ src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
 					{
-						src: 'pwa-192x192.png',
-						sizes: '192x192',
-						type: 'image/png',
-					},
-					{
-						src: 'pwa-512x512.png',
+						src: 'pwa-maskable-512x512.png',
 						sizes: '512x512',
 						type: 'image/png',
-					},
-					{
-						src: 'pwa-512x512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'any maskable',
+						purpose: 'maskable',
 					},
 				],
 			},
 			workbox: {
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+				cleanupOutdatedCaches: true,
+				clientsClaim: false,
+				skipWaiting: false,
+				navigateFallback: '/sudokupado/index.html',
+				navigateFallbackDenylist: [/^\/sudokupado\/version\.json$/, /^\/sudokupado\/assets\//],
 				runtimeCaching: [
 					{
 						urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

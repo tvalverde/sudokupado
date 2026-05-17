@@ -17,11 +17,18 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+	overscroll-behavior: none;
+}
+
 body {
 	margin: 0;
 	min-width: 320px;
 	min-height: 100dvh;
 	overflow: hidden;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
 }
 
 #root {

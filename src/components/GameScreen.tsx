@@ -7,6 +7,7 @@ import { db } from '../db/database';
 import { clearSavedGame as clearSavedGameDb } from '../hooks/useAutoSave';
 import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
+import { isIOS } from '../utils/device';
 import { calculateScore } from '../utils/scoring';
 import SudokuBoard from './SudokuBoard';
 
@@ -97,6 +98,7 @@ const GameScreen: React.FC = () => {
 		};
 
 		const enterFullscreen = async () => {
+			if (isIOS()) return;
 			try {
 				if (document.documentElement.requestFullscreen) {
 					await document.documentElement.requestFullscreen();
@@ -484,6 +486,7 @@ const GameScreen: React.FC = () => {
 							}
 						}}
 						disabled={hintsUsed >= 3}
+						aria-disabled={hintsUsed >= 3}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg disabled:opacity-30 transition-all active:scale-95"
 					>
 						<Lightbulb className="w-5 h-5 mb-1" />
