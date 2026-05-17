@@ -6,27 +6,31 @@ import ReloadPrompt from '../components/ReloadPrompt';
 import { useGameStore } from '../store/gameStore';
 
 // Mock the PWA register hook
-const mockUpdateServiceWorker = vi.fn();
 const mockSetOfflineReady = vi.fn();
 const mockSetNeedRefresh = vi.fn();
 const mockRegistrationUpdate = vi.fn().mockResolvedValue(undefined);
+const mockWaitingSW = {
+	postMessage: vi.fn(),
+	addEventListener: vi.fn(),
+	removeEventListener: vi.fn(),
+};
+const mockRegistration = {
+	waiting: mockWaitingSW,
+	update: mockRegistrationUpdate,
+};
 
 let mockOfflineReady = false;
 let mockNeedRefresh = false;
 
 vi.mock('virtual:pwa-register/react', () => ({
 	useRegisterSW: (options: any) => {
-		// Trigger handlers for coverage - silencing logs to keep test output clean
-		const originalLog = console.log;
-		console.log = vi.fn();
-		if (options?.onRegistered) options.onRegistered({} as any);
+		if (options?.onRegistered) options.onRegistered(mockRegistration as any);
 		if (options?.onRegisterError) options.onRegisterError(new Error('test error'));
-		console.log = originalLog;
 
 		return {
 			offlineReady: [mockOfflineReady, mockSetOfflineReady],
 			needRefresh: [mockNeedRefresh, mockSetNeedRefresh],
-			updateServiceWorker: mockUpdateServiceWorker,
+			updateServiceWorker: vi.fn(),
 		};
 	},
 }));
@@ -38,6 +42,7 @@ describe('PWA Integration Tests', () => {
 		mockNeedRefresh = false;
 		useGameStore.getState().setDeferredPrompt(null);
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ json: () => Promise.resolve({}) }));
+		vi.mocked(window.location.reload).mockClear();
 	});
 
 	describe('ReloadPrompt Component', () => {
@@ -62,14 +67,14 @@ describe('PWA Integration Tests', () => {
 			expect(screen.getByRole('button', { name: /update|actualizar/i })).toBeDefined();
 		});
 
-		it('should call updateServiceWorker when update button is clicked', () => {
+		it('should send SKIP_WAITING to waiting SW when update button is clicked', () => {
 			mockNeedRefresh = true;
 			render(React.createElement(ReloadPrompt));
 
 			const updateBtn = screen.getByRole('button', { name: /update|actualizar/i });
 			fireEvent.click(updateBtn);
 
-			expect(mockUpdateServiceWorker).toHaveBeenCalledWith(true);
+			expect(mockWaitingSW.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
 		});
 
 		it('should call close functions when close button is clicked', () => {

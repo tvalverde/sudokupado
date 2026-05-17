@@ -1,18 +1,19 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 
 function ReloadPrompt() {
 	const { t } = useGameStore();
+	const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+
 	const {
 		offlineReady: [offlineReady, setOfflineReady],
 		needRefresh: [needRefresh, setNeedRefresh],
-		updateServiceWorker,
 	} = useRegisterSW({
 		onRegistered(r: ServiceWorkerRegistration | undefined) {
-			console.log(`SW Registered: ${r}`);
+			if (r) registrationRef.current = r;
 		},
 		onRegisterError(error: unknown) {
 			console.error('SW registration error', error);
@@ -43,6 +44,27 @@ function ReloadPrompt() {
 			})
 			.catch(() => {});
 	}, [needRefresh]);
+
+	const handleUpdate = useCallback(() => {
+		const waiting = registrationRef.current?.waiting ?? null;
+
+		if (!waiting) {
+			window.location.reload();
+			return;
+		}
+
+		const timeout = setTimeout(() => window.location.reload(), 5000);
+
+		waiting.addEventListener('statechange', function onStateChange(e) {
+			if ((e.target as ServiceWorker).state === 'activated') {
+				clearTimeout(timeout);
+				waiting.removeEventListener('statechange', onStateChange);
+				window.location.reload();
+			}
+		});
+
+		waiting.postMessage({ type: 'SKIP_WAITING' });
+	}, []);
 
 	const close = () => {
 		setOfflineReady(false);
@@ -78,7 +100,7 @@ function ReloadPrompt() {
 							{needRefresh ? (
 								<button
 									type="button"
-									onClick={() => updateServiceWorker(true)}
+									onClick={handleUpdate}
 									className="bg-white text-primary-text px-4 py-2 rounded-full font-hanken text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 flex-1 shadow-sm active:scale-95 transition-transform"
 								>
 									<RefreshCw className="w-3 h-3" />

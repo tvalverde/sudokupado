@@ -42,7 +42,7 @@ export default defineConfig({
 			workbox: {
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
 				cleanupOutdatedCaches: true,
-				clientsClaim: true,
+				clientsClaim: false,
 				skipWaiting: false,
 				navigateFallback: '/sudokupado/index.html',
 				navigateFallbackDenylist: [/^\/sudokupado\/version\.json$/, /^\/sudokupado\/assets\//],
