@@ -24,6 +24,7 @@ export interface HistoryEntry {
 	score: number;
 	timeElapsed: number; // In seconds
 	mistakes: number;
+	hintsUsed?: number;
 	date: number; // Timestamp
 }
 

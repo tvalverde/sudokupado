@@ -99,6 +99,12 @@ const TrophiesScreen: React.FC = () => {
 							<span className="font-sans text-xs font-bold text-error">{entry.mistakes}</span>
 							<span className="font-sans text-[10px] uppercase">{t('game.mistakes')}</span>
 						</div>
+						<div className="flex items-center gap-1">
+							<span className="font-sans text-xs font-bold text-secondary">
+								{entry.hintsUsed ?? 0}
+							</span>
+							<span className="font-sans text-[10px] uppercase">{t('game.hint')}</span>
+						</div>
 					</div>
 					<div className="flex flex-col items-end">
 						<span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-wider leading-none mb-1">

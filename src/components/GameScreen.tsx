@@ -192,6 +192,7 @@ const GameScreen: React.FC = () => {
 							score: finalScore,
 							timeElapsed,
 							mistakes,
+							hintsUsed,
 							date: Date.now(),
 						})) as number;
 					}

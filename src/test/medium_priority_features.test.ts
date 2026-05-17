@@ -4,12 +4,12 @@ import { useGameStore } from '../store/gameStore';
 import { calculateScore } from '../utils/scoring';
 
 describe('Audit Fixes & Regression', () => {
-	it('Scoring Utility: should match asymptotic decay formula', () => {
-		// 20 minutes (1200s) should halve the score
-		expect(calculateScore('beginner', 1200, 0, 0)).toBe(1000);
-		// 1 hour (3600s)
-		expect(calculateScore('beginner', 3600, 0, 0)).toBe(500);
-		// 10 hours
+	it('Scoring Utility: should match asymptotic decay formula with perfect bonus', () => {
+		// 20 minutes (1200s): timeFactor=0.5, perfectBonus=1.2 → 2000×0.5×1.2 = 1200
+		expect(calculateScore('beginner', 1200, 0, 0)).toBe(1200);
+		// 1 hour (3600s): timeFactor=0.25 → 2000×0.25×1.2 = 600
+		expect(calculateScore('beginner', 3600, 0, 0)).toBe(600);
+		// 10 hours: score is clamped to ≥0 but never reaches 0
 		expect(calculateScore('beginner', 36000, 0, 0)).toBeGreaterThan(0);
 	});
 
