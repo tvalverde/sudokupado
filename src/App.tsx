@@ -16,7 +16,8 @@ const ResultScreen = lazy(() => import('./components/ResultScreen'));
 const RulesScreen = lazy(() => import('./components/RulesScreen'));
 
 function App() {
-	const { activeScreen, t } = useGameStore();
+	const activeScreen = useGameStore((s) => s.activeScreen);
+	const t = useGameStore((s) => s.t);
 
 	useAutoSave();
 

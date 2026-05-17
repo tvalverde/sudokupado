@@ -145,6 +145,7 @@ export const translations = {
 				'This position requires several chained eliminations. Press Apply to reveal the answer.',
 			apply: 'APPLY HINT',
 			close: 'I GOT IT',
+			error: 'Could not generate hint. Try again.',
 		},
 		orientation: {
 			title: 'Portrait Mode Only',
@@ -318,6 +319,7 @@ export const translations = {
 				'Esta posición requiere varias eliminaciones encadenadas. Pulsa Aplicar para ver la respuesta.',
 			apply: 'APLICAR PISTA',
 			close: 'ENTENDIDO',
+			error: 'No se pudo generar la pista. Inténtalo de nuevo.',
 		},
 		orientation: {
 			title: 'Solo Modo Retrato',

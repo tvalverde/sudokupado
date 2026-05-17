@@ -2,46 +2,67 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Eraser, Lightbulb, Pause, Pencil, Play, RotateCcw, Trophy } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { db } from '../db/database';
+import { clearSavedGame as clearSavedGameDb } from '../hooks/useAutoSave';
 import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
 import { calculateScore } from '../utils/scoring';
 import SudokuBoard from './SudokuBoard';
 
 const GameScreen: React.FC = () => {
+	const selectedDifficulty = useGameStore((s) => s.selectedDifficulty);
+	const timeElapsed = useGameStore((s) => s.timeElapsed);
+	const mistakes = useGameStore((s) => s.mistakes);
+	const isPaused = useGameStore((s) => s.isPaused);
+	const isNoteMode = useGameStore((s) => s.isNoteMode);
+	const hintsUsed = useGameStore((s) => s.hintsUsed);
+	const selectedCell = useGameStore((s) => s.selectedCell);
+	const activePlayerId = useGameStore((s) => s.activePlayerId);
+	const lastGameResult = useGameStore((s) => s.lastGameResult);
+	const maxMistakes = useGameStore((s) => s.maxMistakes);
+	const currentHint = useGameStore((s) => s.currentHint);
+	const grid = useGameStore((s) => s.grid);
+	const solution = useGameStore((s) => s.solution);
+	const initialGrid = useGameStore((s) => s.initialGrid);
+
 	const {
 		setScreen,
-		selectedDifficulty,
-		timeElapsed,
-		mistakes,
-		isPaused,
 		setPaused,
 		incrementTime,
-		isNoteMode,
 		setNoteMode,
-		hintsUsed,
 		useHint: triggerHint,
-		selectedCell,
 		setSelectedCell,
 		setCellValue,
 		toggleNote,
-		activePlayerId,
 		setLastGameResult,
 		t,
-		lastGameResult,
 		isNumberCompleted,
 		restartGame,
 		showDialog,
 		eraseCell,
-		maxMistakes,
-		clearSavedGame,
-		currentHint,
 		applyHint,
 		clearHint,
-		grid,
-		solution,
-		initialGrid,
-	} = useGameStore();
+	} = useGameStore(
+		useShallow((s) => ({
+			setScreen: s.setScreen,
+			setPaused: s.setPaused,
+			incrementTime: s.incrementTime,
+			setNoteMode: s.setNoteMode,
+			useHint: s.useHint,
+			setSelectedCell: s.setSelectedCell,
+			setCellValue: s.setCellValue,
+			toggleNote: s.toggleNote,
+			setLastGameResult: s.setLastGameResult,
+			t: s.t,
+			isNumberCompleted: s.isNumberCompleted,
+			restartGame: s.restartGame,
+			showDialog: s.showDialog,
+			eraseCell: s.eraseCell,
+			applyHint: s.applyHint,
+			clearHint: s.clearHint,
+		})),
+	);
 
 	const { getHint } = useSudokuWorker();
 	const wakeLockRef = useRef<WakeLockSentinel | null>(null);
@@ -149,11 +170,7 @@ const GameScreen: React.FC = () => {
 							cancelText: t('game.game_over_home'),
 							onConfirm: restartGame,
 							onCancel: async () => {
-								const playerId = activePlayerId ?? 0;
-								const existing = await db.gameState.where('playerId').equals(playerId).first();
-								if (existing?.id) await db.gameState.delete(existing.id);
-
-								clearSavedGame();
+								await clearSavedGameDb();
 								setScreen('main');
 							},
 						});
@@ -177,9 +194,7 @@ const GameScreen: React.FC = () => {
 						})) as number;
 					}
 
-					const playerId = activePlayerId ?? 0;
-					const existing = await db.gameState.where('playerId').equals(playerId).first();
-					if (existing?.id) await db.gameState.delete(existing.id);
+					await clearSavedGameDb();
 
 					setLastGameResult({
 						id: historyId,
@@ -212,7 +227,6 @@ const GameScreen: React.FC = () => {
 			setLastGameResult,
 			setScreen,
 			maxMistakes,
-			clearSavedGame,
 			setPaused,
 			showDialog,
 			restartGame,
@@ -447,7 +461,6 @@ const GameScreen: React.FC = () => {
 							vibrate(10);
 							if (hintsUsed >= 3 || currentHint) return;
 
-							// Clear errors before sending grid to worker
 							const cleanGrid = grid.map((row, ri) =>
 								row.map((cellVal, ci) =>
 									cellVal !== 0 && initialGrid[ri][ci] === 0 && cellVal !== solution[ri][ci]
@@ -456,8 +469,19 @@ const GameScreen: React.FC = () => {
 								),
 							);
 
-							const hint = await getHint(cleanGrid, solution);
-							triggerHint(hint);
+							try {
+								const hint = await getHint(cleanGrid, solution);
+								triggerHint(hint);
+							} catch {
+								clearHint();
+								showDialog({
+									title: t('hints.title'),
+									message: t('hints.error'),
+									type: 'info',
+									confirmText: 'OK',
+									onConfirm: () => {},
+								});
+							}
 						}}
 						disabled={hintsUsed >= 3}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg disabled:opacity-30 transition-all active:scale-95"

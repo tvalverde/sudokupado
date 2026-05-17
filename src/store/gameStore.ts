@@ -41,9 +41,9 @@ interface GameStore {
 	// Actions
 	setScreen: (screen: ScreenType) => void;
 	setActivePlayer: (playerId: number | null) => Promise<void>;
-	setDifficulty: (difficulty: Difficulty) => void;
-	setAllowNotes: (allow: boolean) => void;
-	setMaxMistakes: (max: number) => void;
+	setDifficulty: (difficulty: Difficulty) => Promise<void>;
+	setAllowNotes: (allow: boolean) => Promise<void>;
+	setMaxMistakes: (max: number) => Promise<void>;
 	setLastGameResult: (result: GameResult | null) => void;
 	setDeferredPrompt: (prompt: BeforeInstallPromptEvent | null) => void;
 	setLanguage: (lang: Language) => void;
@@ -177,27 +177,36 @@ export const useGameStore = create<GameStore>()(
 				}
 			},
 
-			setDifficulty: (difficulty) => {
+			setDifficulty: async (difficulty) => {
 				set({ selectedDifficulty: difficulty });
 				const { activePlayerId } = get();
-				if (activePlayerId) {
-					db.preferences.where('playerId').equals(activePlayerId).modify({ difficulty });
+				if (!activePlayerId) return;
+				try {
+					await db.preferences.where('playerId').equals(activePlayerId).modify({ difficulty });
+				} catch (err) {
+					console.error('Failed to persist difficulty preference:', err);
 				}
 			},
 
-			setAllowNotes: (allowNotes) => {
+			setAllowNotes: async (allowNotes) => {
 				set({ allowNotes });
 				const { activePlayerId } = get();
-				if (activePlayerId) {
-					db.preferences.where('playerId').equals(activePlayerId).modify({ allowNotes });
+				if (!activePlayerId) return;
+				try {
+					await db.preferences.where('playerId').equals(activePlayerId).modify({ allowNotes });
+				} catch (err) {
+					console.error('Failed to persist allowNotes preference:', err);
 				}
 			},
 
-			setMaxMistakes: (maxMistakes) => {
+			setMaxMistakes: async (maxMistakes) => {
 				set({ maxMistakes });
 				const { activePlayerId } = get();
-				if (activePlayerId) {
-					db.preferences.where('playerId').equals(activePlayerId).modify({ maxMistakes });
+				if (!activePlayerId) return;
+				try {
+					await db.preferences.where('playerId').equals(activePlayerId).modify({ maxMistakes });
+				} catch (err) {
+					console.error('Failed to persist maxMistakes preference:', err);
 				}
 			},
 

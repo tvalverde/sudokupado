@@ -3,18 +3,16 @@ import { useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 
 const SudokuBoard: React.FC = () => {
-	const {
-		grid,
-		initialGrid,
-		notes,
-		selectedCell,
-		setSelectedCell,
-		solution,
-		lastGameResult,
-		currentHint,
-		activeAnimations,
-		clearActiveAnimations,
-	} = useGameStore();
+	const grid = useGameStore((s) => s.grid);
+	const initialGrid = useGameStore((s) => s.initialGrid);
+	const notes = useGameStore((s) => s.notes);
+	const selectedCell = useGameStore((s) => s.selectedCell);
+	const solution = useGameStore((s) => s.solution);
+	const lastGameResult = useGameStore((s) => s.lastGameResult);
+	const currentHint = useGameStore((s) => s.currentHint);
+	const activeAnimations = useGameStore((s) => s.activeAnimations);
+	const setSelectedCell = useGameStore((s) => s.setSelectedCell);
+	const clearActiveAnimations = useGameStore((s) => s.clearActiveAnimations);
 
 	useEffect(() => {
 		const hasAnimation =
