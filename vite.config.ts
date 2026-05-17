@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -6,6 +7,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [
+		{
+			name: 'generate-version-json',
+			closeBundle() {
+				writeFileSync(
+					resolve(__dirname, 'dist/version.json'),
+					JSON.stringify({ version: process.env.npm_package_version ?? '0.0.0' }),
+				);
+			},
+		},
 		react(),
 		VitePWA({
 			registerType: 'prompt',

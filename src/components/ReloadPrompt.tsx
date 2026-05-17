@@ -1,6 +1,7 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 
 function ReloadPrompt() {
@@ -18,9 +19,35 @@ function ReloadPrompt() {
 		},
 	});
 
+	const [newVersion, setNewVersion] = useState<string | null>(null);
+
+	useEffect(() => {
+		const handleVisibility = () => {
+			if (!document.hidden) {
+				navigator.serviceWorker
+					?.getRegistration()
+					.then((reg) => reg?.update())
+					.catch(() => {});
+			}
+		};
+		document.addEventListener('visibilitychange', handleVisibility);
+		return () => document.removeEventListener('visibilitychange', handleVisibility);
+	}, []);
+
+	useEffect(() => {
+		if (!needRefresh) return;
+		fetch('/sudokupado/version.json')
+			.then((res) => res.json())
+			.then((data: { version?: string }) => {
+				if (data.version) setNewVersion(data.version);
+			})
+			.catch(() => {});
+	}, [needRefresh]);
+
 	const close = () => {
 		setOfflineReady(false);
 		setNeedRefresh(false);
+		setNewVersion(null);
 	};
 
 	return (
@@ -38,7 +65,13 @@ function ReloadPrompt() {
 								{offlineReady ? t('pwa.ready') : t('pwa.new_version')}
 							</span>
 							<p className="font-sans text-[10px] opacity-80 leading-tight">
-								{offlineReady ? t('pwa.ready_msg') : t('pwa.new_version_msg')}
+								{offlineReady
+									? t('pwa.ready_msg')
+									: newVersion
+										? t('pwa.version_update')
+												.replace('{from}', __APP_VERSION__)
+												.replace('{to}', newVersion)
+										: t('pwa.new_version_msg')}
 							</p>
 						</div>
 						<div className="flex gap-2 shrink-0 w-full">

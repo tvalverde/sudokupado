@@ -9,6 +9,7 @@ import { useGameStore } from '../store/gameStore';
 const mockUpdateServiceWorker = vi.fn();
 const mockSetOfflineReady = vi.fn();
 const mockSetNeedRefresh = vi.fn();
+const mockRegistrationUpdate = vi.fn().mockResolvedValue(undefined);
 
 let mockOfflineReady = false;
 let mockNeedRefresh = false;
@@ -36,6 +37,7 @@ describe('PWA Integration Tests', () => {
 		mockOfflineReady = false;
 		mockNeedRefresh = false;
 		useGameStore.getState().setDeferredPrompt(null);
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ json: () => Promise.resolve({}) }));
 	});
 
 	describe('ReloadPrompt Component', () => {
@@ -79,6 +81,47 @@ describe('PWA Integration Tests', () => {
 
 			expect(mockSetOfflineReady).toHaveBeenCalledWith(false);
 			expect(mockSetNeedRefresh).toHaveBeenCalledWith(false);
+		});
+
+		it('should display version transition when fetch succeeds', async () => {
+			mockNeedRefresh = true;
+			vi.stubGlobal(
+				'fetch',
+				vi.fn().mockResolvedValue({
+					json: () => Promise.resolve({ version: '9.9.9' }),
+				}),
+			);
+			render(React.createElement(ReloadPrompt));
+			await screen.findByText(/→ 9\.9\.9/);
+			expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith('/sudokupado/version.json');
+		});
+
+		it('should display fallback message when fetch fails', async () => {
+			mockNeedRefresh = true;
+			vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network error')));
+			render(React.createElement(ReloadPrompt));
+			await screen.findByText(/A new update is available|Hay una actualización/i);
+		});
+
+		it('should NOT fetch version.json when only offlineReady is true', () => {
+			mockOfflineReady = true;
+			const mockFetch = vi.fn();
+			vi.stubGlobal('fetch', mockFetch);
+			render(React.createElement(ReloadPrompt));
+			expect(mockFetch).not.toHaveBeenCalled();
+		});
+
+		it('should call serviceWorker.getRegistration().update() when document becomes visible', async () => {
+			vi.stubGlobal('navigator', {
+				...navigator,
+				serviceWorker: {
+					getRegistration: vi.fn().mockResolvedValue({ update: mockRegistrationUpdate }),
+				},
+			});
+			render(React.createElement(ReloadPrompt));
+			Object.defineProperty(document, 'hidden', { value: false, writable: true });
+			document.dispatchEvent(new Event('visibilitychange'));
+			await vi.waitFor(() => expect(mockRegistrationUpdate).toHaveBeenCalled());
 		});
 	});
 
