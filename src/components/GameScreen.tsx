@@ -86,8 +86,7 @@ const GameScreen: React.FC = () => {
 		requestWakeLock();
 		enterFullscreen();
 
-		const handlePopState = (e: PopStateEvent) => {
-			e.preventDefault();
+		const handlePopState = () => {
 			setPaused(true);
 			window.history.pushState(null, '', window.location.pathname);
 		};
@@ -98,6 +97,8 @@ const GameScreen: React.FC = () => {
 		const handleVisibilityChange = () => {
 			if (document.visibilityState === 'hidden') {
 				setPaused(true);
+			} else {
+				requestWakeLock();
 			}
 		};
 		document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -539,8 +540,11 @@ const GameScreen: React.FC = () => {
 								{t('hints.title')}
 							</h3>
 						</div>
-						<p className="font-sans text-sm text-secondary leading-relaxed mb-6">
-							{t(`hints.${currentHint.type}`).replace('{num}', currentHint.value.toString())}
+						<p className="font-sans text-sm text-secondary leading-relaxed">
+							{t(`hints.${currentHint.type}`)}
+						</p>
+						<p className="font-sans text-xs text-secondary/70 leading-relaxed mb-6 mt-2">
+							{t(`hints.${currentHint.type}_why`)}
 						</p>
 						<div className="flex gap-3">
 							<button

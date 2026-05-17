@@ -125,11 +125,24 @@ export const translations = {
 		},
 		hints: {
 			title: 'LOGICAL HINT',
-			naked_single: 'This cell only has one possible candidate: {num}.',
-			hidden_single_row: 'In this row, the number {num} can only fit in this cell.',
-			hidden_single_col: 'In this column, the number {num} can only fit in this cell.',
-			hidden_single_block: 'In this 3x3 block, the number {num} can only fit in this cell.',
-			fallback: 'By advanced elimination, the correct number for this cell is {num}.',
+			naked_single: 'This cell has only one possible candidate.',
+			naked_single_why:
+				"Every other number already appears in this cell's row, column, or 3×3 block. Only one option remains.",
+			hidden_single_row:
+				'In this row, this is the only cell where one specific number can be placed.',
+			hidden_single_row_why:
+				'Scan the other empty cells in this row — each one is blocked by an existing placement in its column or 3×3 block.',
+			hidden_single_col:
+				'In this column, this is the only cell where one specific number can be placed.',
+			hidden_single_col_why:
+				'Scan the other empty cells in this column — each one is blocked by an existing placement in its row or 3×3 block.',
+			hidden_single_block:
+				'In this 3×3 block, this is the only cell where one specific number can be placed.',
+			hidden_single_block_why:
+				'Scan the other empty cells in this 3×3 block — each one is blocked by an existing placement in its row or column.',
+			fallback: 'By advanced elimination, this cell has a unique forced solution.',
+			fallback_why:
+				'This position requires several chained eliminations. Press Apply to reveal the answer.',
 			apply: 'APPLY HINT',
 			close: 'I GOT IT',
 		},
@@ -155,6 +168,7 @@ export const translations = {
 			ready_msg: 'Sudokupado is ready to be played without internet.',
 			new_version: 'New Version Available',
 			new_version_msg: 'A new update is available for a better experience.',
+			version_update: '{from} → {to}',
 			update: 'Update',
 			close: 'Close',
 			loading: 'Loading...',
@@ -285,12 +299,23 @@ export const translations = {
 		},
 		hints: {
 			title: 'PISTA LÓGICA',
-			naked_single:
-				'En esta celda solo puede ir el número {num} porque es el único candidato posible.',
-			hidden_single_row: 'En esta fila, el número {num} solo puede ir en esta posición.',
-			hidden_single_col: 'En esta columna, el número {num} solo puede ir en esta posición.',
-			hidden_single_block: 'En este bloque 3x3, el número {num} solo puede ir en esta posición.',
-			fallback: 'Por eliminación avanzada, el número correcto para esta celda es el {num}.',
+			naked_single: 'Esta celda tiene un único candidato posible.',
+			naked_single_why:
+				'Todos los demás números ya aparecen en la fila, columna o bloque 3×3 de esta celda. Solo queda una opción.',
+			hidden_single_row: 'En esta fila, esta es la única celda donde puede ir un número concreto.',
+			hidden_single_row_why:
+				'Observa las demás celdas vacías de esta fila: cada una está bloqueada por un número ya colocado en su columna o en su bloque 3×3.',
+			hidden_single_col:
+				'En esta columna, esta es la única celda donde puede ir un número concreto.',
+			hidden_single_col_why:
+				'Observa las demás celdas vacías de esta columna: cada una está bloqueada por un número ya colocado en su fila o en su bloque 3×3.',
+			hidden_single_block:
+				'En este bloque 3×3, esta es la única celda donde puede ir un número concreto.',
+			hidden_single_block_why:
+				'Observa las demás celdas vacías de este bloque 3×3: cada una está bloqueada por un número ya colocado en su fila o en su columna.',
+			fallback: 'Por eliminación avanzada, esta celda tiene una única solución posible.',
+			fallback_why:
+				'Esta posición requiere varias eliminaciones encadenadas. Pulsa Aplicar para ver la respuesta.',
 			apply: 'APLICAR PISTA',
 			close: 'ENTENDIDO',
 		},
@@ -316,6 +341,7 @@ export const translations = {
 			ready_msg: 'SUDOKUPADO ya puede jugarse sin conexión a internet.',
 			new_version: 'Nueva versión disponible',
 			new_version_msg: 'Hay una actualización disponible para mejorar tu experiencia.',
+			version_update: '{from} → {to}',
 			update: 'Actualizar',
 			close: 'Cerrar',
 			loading: 'Cargando...',

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { translations } from '../utils/translations';
 import { engine } from '../workers/sudokuWorker';
 
 describe('SudokuEngine: getLogicalHint', () => {
@@ -68,5 +69,20 @@ describe('SudokuEngine: getLogicalHint', () => {
 		const hint = engine.getLogicalHint(grid, solution);
 		expect(hint).toBeDefined();
 		expect(hint.value).toBe(5);
+	});
+
+	it('should have _why explanation keys for all hint types in both languages', () => {
+		const types = [
+			'naked_single',
+			'hidden_single_row',
+			'hidden_single_col',
+			'hidden_single_block',
+			'fallback',
+		] as const;
+		for (const type of types) {
+			const whyKey = `${type}_why` as keyof typeof translations.en.hints;
+			expect(translations.en.hints[whyKey]).toBeDefined();
+			expect(translations.es.hints[whyKey]).toBeDefined();
+		}
 	});
 });
