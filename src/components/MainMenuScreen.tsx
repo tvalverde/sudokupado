@@ -220,7 +220,7 @@ const MainMenuScreen: React.FC = () => {
 			</main>
 
 			{/* Fixed Action Area - Positioned above BottomNavBar */}
-			<div className="absolute bottom-16 w-full p-5 bg-white border-t border-border z-20">
+			<div className="absolute bottom-[calc(4rem+env(safe-area-inset-bottom))] w-full p-5 bg-white border-t border-border z-20">
 				<Button
 					variant="primary"
 					size="xl"
