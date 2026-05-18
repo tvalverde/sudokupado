@@ -4,6 +4,8 @@ import { Check, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../store/gameStore';
 
+export const RELOAD_FALLBACK_MS = 5000;
+
 function ReloadPrompt() {
 	const { t } = useGameStore();
 	const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -53,15 +55,11 @@ function ReloadPrompt() {
 			return;
 		}
 
-		const timeout = setTimeout(() => window.location.reload(), 5000);
-
-		waiting.addEventListener('statechange', function onStateChange(e) {
-			if ((e.target as ServiceWorker).state === 'activated') {
-				clearTimeout(timeout);
-				waiting.removeEventListener('statechange', onStateChange);
-				window.location.reload();
-			}
-		});
+		// The actual reload is owned by the global `controllerchange` listener
+		// in main.tsx, which fires only after the new SW takes control of the
+		// client. This fallback covers user agents where `controllerchange`
+		// never fires (e.g. iOS Safari in standalone mode).
+		setTimeout(() => window.location.reload(), RELOAD_FALLBACK_MS);
 
 		waiting.postMessage({ type: 'SKIP_WAITING' });
 	}, []);

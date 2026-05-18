@@ -1,73 +1,128 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import ReloadPrompt from '../components/ReloadPrompt';
+import { installSWUpdateListener } from '../utils/swUpdateListener';
 
-describe('Regression: PWA update reloads reliably without nav disappearing', () => {
+const mockSetOfflineReady = vi.fn();
+const mockSetNeedRefresh = vi.fn();
+const mockWaitingSW = {
+	postMessage: vi.fn(),
+	addEventListener: vi.fn(),
+	removeEventListener: vi.fn(),
+};
+const mockRegistration = {
+	waiting: mockWaitingSW,
+	update: vi.fn().mockResolvedValue(undefined),
+};
+
+let mockNeedRefresh = false;
+
+vi.mock('virtual:pwa-register/react', () => ({
+	useRegisterSW: (options: { onRegistered?: (r: unknown) => void }) => {
+		if (options?.onRegistered) options.onRegistered(mockRegistration);
+		return {
+			offlineReady: [false, mockSetOfflineReady],
+			needRefresh: [mockNeedRefresh, mockSetNeedRefresh],
+			updateServiceWorker: vi.fn(),
+		};
+	},
+}));
+
+const createServiceWorkerMock = (controller: unknown) => {
+	const target = new EventTarget() as EventTarget & {
+		controller: unknown;
+		register: ReturnType<typeof vi.fn>;
+		getRegistration: ReturnType<typeof vi.fn>;
+	};
+	target.controller = controller;
+	target.register = vi.fn();
+	target.getRegistration = vi.fn().mockResolvedValue(undefined);
+	return target;
+};
+
+const stubServiceWorker = (sw: unknown) => {
+	Object.defineProperty(navigator, 'serviceWorker', {
+		value: sw,
+		configurable: true,
+		writable: true,
+	});
+};
+
+describe('Regression: SW update reload contract', () => {
+	const originalServiceWorkerDescriptor = Object.getOwnPropertyDescriptor(
+		Object.getPrototypeOf(navigator),
+		'serviceWorker',
+	);
+
 	beforeEach(() => {
-		vi.mocked(window.location.reload).mockClear();
+		vi.clearAllMocks();
+		mockNeedRefresh = false;
+		vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ json: () => Promise.resolve({}) }));
 	});
 
-	it('sends SKIP_WAITING and reloads when SW reaches activated state', async () => {
-		const mockWaiting = new EventTarget() as EventTarget & {
-			state: string;
-			postMessage: (message: unknown) => void;
-		};
-		mockWaiting.state = 'installed';
-		mockWaiting.postMessage = vi.fn();
+	afterEach(() => {
+		if (originalServiceWorkerDescriptor) {
+			Object.defineProperty(
+				Object.getPrototypeOf(navigator),
+				'serviceWorker',
+				originalServiceWorkerDescriptor,
+			);
+		}
+	});
 
-		const timeout = setTimeout(() => window.location.reload(), 5000);
-		const done = new Promise<void>((resolve) => {
-			const handler = (e: Event) => {
-				if ((e.target as typeof mockWaiting).state === 'activated') {
-					clearTimeout(timeout);
-					mockWaiting.removeEventListener('statechange', handler);
-					window.location.reload();
-					resolve();
-				}
-			};
-			mockWaiting.addEventListener('statechange', handler);
+	describe('handleUpdate', () => {
+		it('sends SKIP_WAITING and does NOT reload synchronously when clicking Update', () => {
+			mockNeedRefresh = true;
+
+			render(React.createElement(ReloadPrompt));
+			const updateBtn = screen.getByRole('button', { name: /update|actualizar/i });
+			fireEvent.click(updateBtn);
+
+			expect(mockWaitingSW.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+			expect(window.location.reload).not.toHaveBeenCalled();
 		});
 
-		mockWaiting.postMessage({ type: 'SKIP_WAITING' });
+		it('does NOT register a statechange listener on the waiting SW (reload is owned by controllerchange)', () => {
+			mockNeedRefresh = true;
 
-		expect(mockWaiting.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
-		expect(window.location.reload).not.toHaveBeenCalled();
+			render(React.createElement(ReloadPrompt));
+			const updateBtn = screen.getByRole('button', { name: /update|actualizar/i });
+			fireEvent.click(updateBtn);
 
-		mockWaiting.state = 'activated';
-		mockWaiting.dispatchEvent(new Event('statechange'));
-
-		await done;
-		expect(window.location.reload).toHaveBeenCalledTimes(1);
-		clearTimeout(timeout);
+			expect(mockWaitingSW.addEventListener).not.toHaveBeenCalled();
+		});
 	});
 
-	it('falls back to immediate reload when no waiting SW exists', () => {
-		const waiting: ServiceWorker | null = null;
-		if (!waiting) window.location.reload();
-		expect(window.location.reload).toHaveBeenCalledTimes(1);
-	});
+	describe('installSWUpdateListener', () => {
+		it('reloads exactly once when controllerchange fires after the page already had a SW controller', () => {
+			const sw = createServiceWorkerMock({ scriptURL: 'old' });
+			stubServiceWorker(sw);
 
-	it('does not reload before SW reaches activated state', async () => {
-		const mockWaiting = new EventTarget() as EventTarget & {
-			state: string;
-			postMessage: (message: unknown) => void;
-		};
-		mockWaiting.state = 'installing';
-		mockWaiting.postMessage = vi.fn();
+			installSWUpdateListener();
 
-		const timeout = setTimeout(() => window.location.reload(), 5000);
-		mockWaiting.addEventListener('statechange', function onStateChange(e) {
-			if ((e.target as typeof mockWaiting).state === 'activated') {
-				clearTimeout(timeout);
-				mockWaiting.removeEventListener('statechange', onStateChange);
-				window.location.reload();
-			}
+			sw.dispatchEvent(new Event('controllerchange'));
+			sw.dispatchEvent(new Event('controllerchange'));
+
+			expect(window.location.reload).toHaveBeenCalledTimes(1);
 		});
 
-		mockWaiting.state = 'activating';
-		mockWaiting.dispatchEvent(new Event('statechange'));
+		it('does NOT reload on first install (no previous controller)', () => {
+			const sw = createServiceWorkerMock(null);
+			stubServiceWorker(sw);
 
-		await new Promise((r) => setTimeout(r, 50));
+			installSWUpdateListener();
 
-		expect(window.location.reload).not.toHaveBeenCalled();
-		clearTimeout(timeout);
+			sw.dispatchEvent(new Event('controllerchange'));
+
+			expect(window.location.reload).not.toHaveBeenCalled();
+		});
+
+		it('is a no-op when serviceWorker is not available', () => {
+			stubServiceWorker(undefined);
+
+			expect(() => installSWUpdateListener()).not.toThrow();
+			expect(window.location.reload).not.toHaveBeenCalled();
+		});
 	});
 });
