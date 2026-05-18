@@ -32,8 +32,12 @@ export const isValidHistoryEntry = (v: unknown): v is HistoryEntry => {
 		typeof h.playerId === 'number' &&
 		isValidDifficulty(h.difficulty) &&
 		typeof h.score === 'number' &&
+		h.score >= 0 &&
 		typeof h.timeElapsed === 'number' &&
+		h.timeElapsed >= 0 &&
 		typeof h.mistakes === 'number' &&
+		h.mistakes >= 0 &&
+		h.mistakes <= 999 &&
 		typeof h.date === 'number'
 	);
 };
@@ -43,7 +47,9 @@ const isValid9x9Grid = (v: unknown): v is number[][] =>
 	v.length === 9 &&
 	v.every(
 		(row) =>
-			Array.isArray(row) && row.length === 9 && row.every((cell) => typeof cell === 'number'),
+			Array.isArray(row) &&
+			row.length === 9 &&
+			row.every((cell) => typeof cell === 'number' && cell >= 0 && cell <= 9),
 	);
 
 const isValidNotes = (v: unknown): v is number[][][] =>
@@ -69,8 +75,11 @@ export const isValidGameState = (v: unknown): v is GameState => {
 		isValid9x9Grid(g.solution) &&
 		isValidNotes(g.notes) &&
 		typeof g.timeElapsed === 'number' &&
+		g.timeElapsed >= 0 &&
 		typeof g.mistakes === 'number' &&
+		g.mistakes >= 0 &&
 		typeof g.hintsUsed === 'number' &&
+		g.hintsUsed >= 0 &&
 		typeof g.isPaused === 'boolean' &&
 		isValidDifficulty(g.difficulty)
 	);

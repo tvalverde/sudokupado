@@ -92,6 +92,14 @@ describe('isValidHistoryEntry', () => {
 		expect(isValidHistoryEntry({ ...valid, score: '5000' })).toBe(false);
 		expect(isValidHistoryEntry({ ...valid, date: null })).toBe(false);
 	});
+
+	it('rejects out-of-range numeric fields', () => {
+		expect(isValidHistoryEntry({ ...valid, score: -1 })).toBe(false);
+		expect(isValidHistoryEntry({ ...valid, timeElapsed: -1 })).toBe(false);
+		expect(isValidHistoryEntry({ ...valid, mistakes: -1 })).toBe(false);
+		expect(isValidHistoryEntry({ ...valid, mistakes: 1000 })).toBe(false);
+		expect(isValidHistoryEntry({ ...valid, mistakes: 999 })).toBe(true);
+	});
 });
 
 describe('isValidGameState', () => {
@@ -141,6 +149,22 @@ describe('isValidGameState', () => {
 		const badNotes = makeNotes();
 		badNotes[0][0] = [0, 10];
 		expect(isValidGameState({ ...valid, notes: badNotes })).toBe(false);
+	});
+
+	it('rejects grid cells out of range (0-9)', () => {
+		const badGrid = makeGrid();
+		badGrid[0][0] = -1;
+		expect(isValidGameState({ ...valid, grid: badGrid })).toBe(false);
+
+		const badGrid2 = makeGrid();
+		badGrid2[4][4] = 10;
+		expect(isValidGameState({ ...valid, solution: badGrid2 })).toBe(false);
+	});
+
+	it('rejects out-of-range numeric fields', () => {
+		expect(isValidGameState({ ...valid, timeElapsed: -5 })).toBe(false);
+		expect(isValidGameState({ ...valid, mistakes: -1 })).toBe(false);
+		expect(isValidGameState({ ...valid, hintsUsed: -1 })).toBe(false);
 	});
 });
 

@@ -39,7 +39,7 @@ function ReloadPrompt() {
 
 	useEffect(() => {
 		if (!needRefresh) return;
-		fetch('/sudokupado/version.json')
+		fetch(`${import.meta.env.BASE_URL}version.json`)
 			.then((res) => res.json())
 			.then((data: { version?: string }) => {
 				if (data.version) setNewVersion(data.version);

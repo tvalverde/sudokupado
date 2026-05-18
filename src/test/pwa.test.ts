@@ -98,7 +98,9 @@ describe('PWA Integration Tests', () => {
 			);
 			render(React.createElement(ReloadPrompt));
 			await screen.findByText(/→ 9\.9\.9/);
-			expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith('/sudokupado/version.json');
+			expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith(
+				`${import.meta.env.BASE_URL}version.json`,
+			);
 		});
 
 		it('should display fallback message when fetch fails', async () => {

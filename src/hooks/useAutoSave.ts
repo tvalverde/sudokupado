@@ -28,7 +28,7 @@ export const useAutoSave = () => {
 		const isWon = currentState.lastGameResult !== null;
 		const isLost =
 			currentState.maxMistakes > 0 && currentState.mistakes >= currentState.maxMistakes;
-		const isCleared = currentState.solution[0]?.[0] === 0;
+		const isCleared = !currentState.hasActiveGame;
 
 		if (isWon || isLost || isCleared) {
 			await clearSavedGame();

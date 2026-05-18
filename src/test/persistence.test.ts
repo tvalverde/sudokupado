@@ -31,6 +31,7 @@ describe('useAutoSave real DB integration', () => {
 		useGameStore.setState({
 			activePlayerId: 1,
 			activeScreen: 'game',
+			hasActiveGame: true,
 			timeElapsed: 0,
 			isPaused: false,
 			grid: empty9x9(),

@@ -97,6 +97,7 @@ describe('Regression: PWA update does not erase saved game', () => {
 			useGameStore.setState({
 				activeScreen: 'game',
 				activePlayerId: null,
+				hasActiveGame: true,
 				grid: full9x9(),
 				initialGrid: full9x9(),
 				solution: full9x9(),

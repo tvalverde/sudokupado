@@ -32,6 +32,7 @@ describe('Regression: AutoSave Race Condition vs Delete', () => {
 		useGameStore.setState({
 			activePlayerId: 1,
 			activeScreen: 'game',
+			hasActiveGame: true,
 			timeElapsed: 10,
 			isPaused: false,
 			grid: empty9x9(),

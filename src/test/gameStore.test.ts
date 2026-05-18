@@ -74,6 +74,43 @@ describe('GameStore Logic & Regression', () => {
 		expect(result.isFinished).toBe(true);
 	});
 
+	it('sets hasActiveGame to true on initGame, false on clearSavedGame', () => {
+		const { initGame, clearSavedGame } = useGameStore.getState();
+		const initial = [[1]];
+		const solution = [[1]];
+
+		initGame(initial, solution, 'beginner');
+		expect(useGameStore.getState().hasActiveGame).toBe(true);
+
+		clearSavedGame();
+		expect(useGameStore.getState().hasActiveGame).toBe(false);
+	});
+
+	it('sets hasActiveGame to true on resumeGame', () => {
+		const { resumeGame } = useGameStore.getState();
+		const savedState = {
+			playerId: 0,
+			grid: [[1]],
+			initialGrid: [[0]],
+			solution: [[1]],
+			notes: Array(9)
+				.fill(null)
+				.map(() =>
+					Array(9)
+						.fill(null)
+						.map(() => [] as number[]),
+				) as number[][][],
+			mistakes: 0,
+			hintsUsed: 0,
+			timeElapsed: 30,
+			isPaused: false,
+			difficulty: 'beginner' as const,
+		};
+
+		resumeGame(savedState);
+		expect(useGameStore.getState().hasActiveGame).toBe(true);
+	});
+
 	it('should correctly resume a saved game (Regression for white screen bug)', () => {
 		const { resumeGame } = useGameStore.getState();
 		const savedState = {

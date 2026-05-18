@@ -52,6 +52,7 @@ interface GameStore {
 	closeDialog: () => void;
 
 	// Game Play State
+	hasActiveGame: boolean;
 	grid: number[][];
 	initialGrid: number[][];
 	solution: number[][];
@@ -135,6 +136,7 @@ export const useGameStore = create<GameStore>()(
 				onConfirm: () => {},
 			},
 
+			hasActiveGame: false,
 			grid: emptyGrid(),
 			initialGrid: emptyGrid(),
 			solution: emptyGrid(),
@@ -234,6 +236,7 @@ export const useGameStore = create<GameStore>()(
 
 			initGame: (initial, solution, difficulty) =>
 				set({
+					hasActiveGame: true,
 					grid: initial.map((row) => [...row]),
 					initialGrid: initial.map((row) => [...row]),
 					solution: solution.map((row) => [...row]),
@@ -251,6 +254,7 @@ export const useGameStore = create<GameStore>()(
 
 			resumeGame: (saved) =>
 				set({
+					hasActiveGame: true,
 					grid: saved.grid,
 					initialGrid: saved.initialGrid,
 					solution: saved.solution,
@@ -283,6 +287,7 @@ export const useGameStore = create<GameStore>()(
 
 			clearSavedGame: () =>
 				set({
+					hasActiveGame: false,
 					grid: emptyGrid(),
 					initialGrid: emptyGrid(),
 					solution: emptyGrid(),
