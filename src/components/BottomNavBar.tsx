@@ -13,7 +13,10 @@ const BottomNavBar: React.FC = () => {
 	];
 
 	return (
-		<nav className="absolute bottom-0 left-0 w-full bg-white border-t border-border z-40 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+		<nav
+			id="bottom-nav"
+			className="absolute bottom-0 left-0 w-full bg-white border-t border-border z-40 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+		>
 			<div className="flex justify-around items-center h-16">
 				{navItems.map((item) => {
 					const Icon = item.icon;
