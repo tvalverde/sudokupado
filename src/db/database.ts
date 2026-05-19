@@ -19,6 +19,22 @@ export class SudokupadoDB extends Dexie {
 			history: '++id, playerId, difficulty, score, date',
 			gameState: '++id, playerId',
 		});
+
+		this.version(2)
+			.stores({
+				players: '++id, name, createdAt, isDeleted',
+				preferences: '++id, playerId, difficulty',
+				history: '++id, playerId, difficulty, score, date',
+				gameState: '++id, playerId',
+			})
+			.upgrade((tx) =>
+				tx
+					.table<Preferences>('preferences')
+					.toCollection()
+					.modify((p) => {
+						if (typeof p.maxHints !== 'number') p.maxHints = 3;
+					}),
+			);
 	}
 }
 

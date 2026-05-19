@@ -8,6 +8,7 @@ import { clearSavedGame as clearSavedGameDb } from '../hooks/useAutoSave';
 import { useSudokuWorker } from '../hooks/useSudokuWorker';
 import { useGameStore } from '../store/gameStore';
 import { isIOS } from '../utils/device';
+import { isMistakeLimitReached } from '../utils/gameState';
 import { calculateScore } from '../utils/scoring';
 import SudokuBoard from './SudokuBoard';
 
@@ -22,6 +23,7 @@ const GameScreen: React.FC = () => {
 	const activePlayerId = useGameStore((s) => s.activePlayerId);
 	const lastGameResult = useGameStore((s) => s.lastGameResult);
 	const maxMistakes = useGameStore((s) => s.maxMistakes);
+	const maxHints = useGameStore((s) => s.maxHints);
 	const currentHint = useGameStore((s) => s.currentHint);
 	const grid = useGameStore((s) => s.grid);
 	const solution = useGameStore((s) => s.solution);
@@ -162,7 +164,7 @@ const GameScreen: React.FC = () => {
 				if (!isCorrect) {
 					vibrate([100, 50, 100]);
 
-					if (maxMistakes > 0 && mistakes + 1 >= maxMistakes) {
+					if (isMistakeLimitReached(mistakes + 1, maxMistakes)) {
 						setPaused(true);
 						showDialog({
 							title: t('game.game_over_title'),
@@ -376,7 +378,11 @@ const GameScreen: React.FC = () => {
 							{t('game.mistakes')}
 						</span>
 						<span className="font-hanken text-lg font-bold text-primary-text">
-							{mistakes}/{maxMistakes > 0 ? maxMistakes : '∞'}
+							{maxMistakes === 0
+								? t('game.no_mistakes_allowed')
+								: maxMistakes === -1
+									? `${mistakes}/∞`
+									: `${mistakes}/${maxMistakes}`}
 						</span>
 					</div>
 				</div>
@@ -462,7 +468,7 @@ const GameScreen: React.FC = () => {
 						type="button"
 						onClick={async () => {
 							vibrate(10);
-							if (hintsUsed >= 3 || currentHint) return;
+							if (maxHints <= 0 || hintsUsed >= maxHints || currentHint) return;
 
 							const cleanGrid = grid.map((row, ri) =>
 								row.map((cellVal, ci) =>
@@ -486,13 +492,15 @@ const GameScreen: React.FC = () => {
 								});
 							}
 						}}
-						disabled={hintsUsed >= 3}
-						aria-disabled={hintsUsed >= 3}
+						disabled={maxHints <= 0 || hintsUsed >= maxHints}
+						aria-disabled={maxHints <= 0 || hintsUsed >= maxHints}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg disabled:opacity-30 transition-all active:scale-95"
 					>
 						<Lightbulb className="w-5 h-5 mb-1" />
 						<span className="font-hanken text-[10px] font-bold tracking-wider uppercase">
-							{t('game.hint')} ({hintsUsed}/3)
+							{maxHints <= 0
+								? t('game.no_hints_allowed')
+								: `${t('game.hint')} (${hintsUsed}/${maxHints})`}
 						</span>
 					</button>
 					<button

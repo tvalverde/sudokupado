@@ -14,7 +14,10 @@ export interface Preferences {
 	playerId: number;
 	difficulty: Difficulty;
 	allowNotes: boolean;
+	// -1 means unlimited mistakes; 0 means strict mode (game over on first error); >0 is the explicit cap.
 	maxMistakes: number;
+	// 0 means hints are disabled for the session; otherwise the maximum hints allowed.
+	maxHints: number;
 }
 
 export interface HistoryEntry {

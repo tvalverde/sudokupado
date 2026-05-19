@@ -39,37 +39,74 @@ describe('isValidPlayer', () => {
 });
 
 describe('isValidPreferences', () => {
-	it('accepts valid preferences', () => {
-		expect(
-			isValidPreferences({ playerId: 1, difficulty: 'expert', allowNotes: true, maxMistakes: 3 }),
-		).toBe(true);
-		expect(
-			isValidPreferences({
-				playerId: 2,
-				difficulty: 'beginner',
-				allowNotes: false,
-				maxMistakes: 0,
-			}),
-		).toBe(true);
+	it('accepts the canonical maxMistakes values (-1, 0, 3, 5) combined with valid maxHints', () => {
+		for (const maxMistakes of [-1, 0, 3, 5]) {
+			expect(
+				isValidPreferences({
+					playerId: 1,
+					difficulty: 'expert',
+					allowNotes: true,
+					maxMistakes,
+					maxHints: 3,
+				}),
+			).toBe(true);
+		}
+		for (const maxHints of [0, 3, 5]) {
+			expect(
+				isValidPreferences({
+					playerId: 1,
+					difficulty: 'beginner',
+					allowNotes: false,
+					maxMistakes: 0,
+					maxHints,
+				}),
+			).toBe(true);
+		}
 	});
 
-	it('rejects maxMistakes out of range', () => {
+	it('rejects maxMistakes outside the canonical set', () => {
+		for (const bad of [-2, 1, 2, 4, 6]) {
+			expect(
+				isValidPreferences({
+					playerId: 1,
+					difficulty: 'beginner',
+					allowNotes: true,
+					maxMistakes: bad,
+					maxHints: 3,
+				}),
+			).toBe(false);
+		}
+	});
+
+	it('rejects maxHints outside the canonical set', () => {
+		for (const bad of [-1, 1, 2, 4, 6]) {
+			expect(
+				isValidPreferences({
+					playerId: 1,
+					difficulty: 'beginner',
+					allowNotes: true,
+					maxMistakes: 3,
+					maxHints: bad,
+				}),
+			).toBe(false);
+		}
+	});
+
+	it('rejects preferences missing maxHints (post v2 schema)', () => {
 		expect(
-			isValidPreferences({ playerId: 1, difficulty: 'beginner', allowNotes: true, maxMistakes: 4 }),
-		).toBe(false);
-		expect(
-			isValidPreferences({
-				playerId: 1,
-				difficulty: 'beginner',
-				allowNotes: true,
-				maxMistakes: -1,
-			}),
+			isValidPreferences({ playerId: 1, difficulty: 'expert', allowNotes: true, maxMistakes: 3 }),
 		).toBe(false);
 	});
 
 	it('rejects invalid difficulty', () => {
 		expect(
-			isValidPreferences({ playerId: 1, difficulty: 'easy', allowNotes: true, maxMistakes: 1 }),
+			isValidPreferences({
+				playerId: 1,
+				difficulty: 'easy',
+				allowNotes: true,
+				maxMistakes: 3,
+				maxHints: 3,
+			}),
 		).toBe(false);
 	});
 });
@@ -174,7 +211,9 @@ describe('isValidBackup', () => {
 		version: 1,
 		exportDate: Date.now(),
 		players: [{ name: 'Alice', createdAt: 1000, isDeleted: 0 }],
-		preferences: [{ playerId: 1, difficulty: 'beginner', allowNotes: true, maxMistakes: 3 }],
+		preferences: [
+			{ playerId: 1, difficulty: 'beginner', allowNotes: true, maxMistakes: 3, maxHints: 3 },
+		],
 		history: [
 			{
 				playerId: 1,
@@ -210,7 +249,7 @@ describe('isValidBackup', () => {
 	it('rejects corrupted preferences', () => {
 		const bad = makeValidBackup();
 		bad.preferences = [
-			{ playerId: 1, difficulty: 'god_mode', allowNotes: true, maxMistakes: 3 } as any,
+			{ playerId: 1, difficulty: 'god_mode', allowNotes: true, maxMistakes: 3, maxHints: 3 } as any,
 		];
 		expect(isValidBackup(bad)).toBe(false);
 	});

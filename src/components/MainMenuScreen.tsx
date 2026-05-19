@@ -24,6 +24,8 @@ const MainMenuScreen: React.FC = () => {
 		setAllowNotes,
 		maxMistakes,
 		setMaxMistakes,
+		maxHints,
+		setMaxHints,
 	} = useGameStore();
 
 	const [isPlayerMenuOpen, setIsPlayerMenuOpen] = useState(false);
@@ -199,8 +201,8 @@ const MainMenuScreen: React.FC = () => {
 					<h3 className="font-hanken text-xs font-bold text-secondary text-center tracking-widest-premium uppercase">
 						{t('main_menu.mistakes_label')}
 					</h3>
-					<div className="flex justify-center gap-6">
-						{[0, 3, 5].map((limit) => (
+					<div className="flex justify-center gap-4">
+						{[0, 3, 5, -1].map((limit) => (
 							<button
 								type="button"
 								key={limit}
@@ -208,6 +210,30 @@ const MainMenuScreen: React.FC = () => {
 								onClick={() => setMaxMistakes(limit)}
 								className={`w-16 h-16 rounded-full font-hanken text-xl flex items-center justify-center transition-all border ${
 									maxMistakes === limit
+										? 'bg-primary-text text-white border-transparent shadow-md'
+										: 'bg-white text-primary-text border-border hover:bg-subtle-bg'
+								}`}
+							>
+								{limit === -1 ? '∞' : limit}
+							</button>
+						))}
+					</div>
+				</section>
+
+				{/* Hints Limit */}
+				<section className="space-y-4">
+					<h3 className="font-hanken text-xs font-bold text-secondary text-center tracking-widest-premium uppercase">
+						{t('main_menu.hints_label')}
+					</h3>
+					<div className="flex justify-center gap-6">
+						{[0, 3, 5].map((limit) => (
+							<button
+								type="button"
+								key={limit}
+								disabled={isLoading}
+								onClick={() => setMaxHints(limit)}
+								className={`w-16 h-16 rounded-full font-hanken text-xl flex items-center justify-center transition-all border ${
+									maxHints === limit
 										? 'bg-primary-text text-white border-transparent shadow-md'
 										: 'bg-white text-primary-text border-border hover:bg-subtle-bg'
 								}`}

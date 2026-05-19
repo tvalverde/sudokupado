@@ -105,10 +105,32 @@ describe('Regression: Game Over on Max Mistakes', () => {
 		expect(useGameStore.getState().activeScreen).toBe('main');
 	});
 
-	it('should NOT trigger game over when maxMistakes is 0 (Infinite mode)', async () => {
+	it('should trigger game over on the first mistake when maxMistakes is 0 (Strict mode)', async () => {
 		const store = useGameStore.getState();
 		act(() => {
 			store.setMaxMistakes(0);
+			useGameStore.setState({ mistakes: 0 });
+		});
+
+		render(React.createElement(GameScreen));
+
+		const cell = screen.getByTestId('cell-0-2');
+		fireEvent.click(cell);
+		const button1 = screen.getByRole('button', { name: '1' }); // Wrong (solution is 4)
+
+		act(() => {
+			fireEvent.click(button1);
+		});
+
+		expect(useGameStore.getState().mistakes).toBe(1);
+		expect(useGameStore.getState().dialog.isOpen).toBe(true);
+		expect(useGameStore.getState().dialog.title).toMatch(/Game Over|Fin de la Partida/i);
+	});
+
+	it('should NOT trigger game over when maxMistakes is -1 (Infinite mode)', async () => {
+		const store = useGameStore.getState();
+		act(() => {
+			store.setMaxMistakes(-1);
 			useGameStore.setState({ mistakes: 10 }); // Already 10 errors
 		});
 

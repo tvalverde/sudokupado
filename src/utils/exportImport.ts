@@ -38,6 +38,14 @@ export const importDatabaseFromJson = async (file: File) => {
 		const text = await file.text();
 		const data = JSON.parse(text);
 
+		// Backwards compatibility: legacy backups (pre-maxHints) default to 3 hints per session.
+		if (Array.isArray(data?.preferences)) {
+			data.preferences = data.preferences.map((p: Record<string, unknown>) => ({
+				...p,
+				maxHints: typeof p.maxHints === 'number' ? p.maxHints : 3,
+			}));
+		}
+
 		if (!isValidBackup(data)) {
 			throw new Error('Invalid or corrupted backup file');
 		}

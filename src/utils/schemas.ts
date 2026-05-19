@@ -12,6 +12,9 @@ export const isValidPlayer = (v: unknown): v is Player =>
 	typeof (v as Player).createdAt === 'number' &&
 	((v as Player).isDeleted === 0 || (v as Player).isDeleted === 1);
 
+const VALID_MAX_MISTAKES = new Set([-1, 0, 3, 5]);
+const VALID_MAX_HINTS = new Set([0, 3, 5]);
+
 export const isValidPreferences = (v: unknown): v is Preferences => {
 	if (typeof v !== 'object' || v === null) return false;
 	const p = v as Preferences;
@@ -20,8 +23,9 @@ export const isValidPreferences = (v: unknown): v is Preferences => {
 		isValidDifficulty(p.difficulty) &&
 		typeof p.allowNotes === 'boolean' &&
 		typeof p.maxMistakes === 'number' &&
-		p.maxMistakes >= 0 &&
-		p.maxMistakes <= 3
+		VALID_MAX_MISTAKES.has(p.maxMistakes) &&
+		typeof p.maxHints === 'number' &&
+		VALID_MAX_HINTS.has(p.maxHints)
 	);
 };
 

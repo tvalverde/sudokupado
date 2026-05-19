@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { db } from '../db/database';
 import { useGameStore } from '../store/gameStore';
+import { hasUserInput, isMistakeLimitReached } from '../utils/gameState';
 
 export const clearSavedGame = async (): Promise<void> => {
 	const { activePlayerId } = useGameStore.getState();
@@ -26,8 +27,7 @@ export const useAutoSave = () => {
 		const playerId = activePlayerId ?? 0;
 
 		const isWon = currentState.lastGameResult !== null;
-		const isLost =
-			currentState.maxMistakes > 0 && currentState.mistakes >= currentState.maxMistakes;
+		const isLost = isMistakeLimitReached(currentState.mistakes, currentState.maxMistakes);
 		const isCleared = !currentState.hasActiveGame;
 
 		if (isWon || isLost || isCleared) {
@@ -96,7 +96,17 @@ export const useAutoSave = () => {
 			const hasLeftGame = prevState.activeScreen === 'game' && state.activeScreen !== 'game';
 			const hasPaused = !prevState.isPaused && state.isPaused;
 
-			if (hasPaused || hasLeftGame) {
+			if (hasLeftGame) {
+				// Intentional navigation back to the menu: only keep the save if the player produced input.
+				if (hasUserInput(state.grid, state.initialGrid, state.notes)) {
+					saveGame(true);
+				} else {
+					clearSavedGame().catch((err) => console.error('Failed to discard untouched game:', err));
+				}
+				return;
+			}
+
+			if (hasPaused) {
 				saveGame(true);
 			}
 		});

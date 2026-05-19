@@ -34,6 +34,7 @@ interface GameStore {
 	selectedDifficulty: Difficulty;
 	allowNotes: boolean;
 	maxMistakes: number;
+	maxHints: number;
 	lastGameResult: GameResult | null;
 	language: Language;
 	dialog: DialogState;
@@ -44,6 +45,7 @@ interface GameStore {
 	setDifficulty: (difficulty: Difficulty) => Promise<void>;
 	setAllowNotes: (allow: boolean) => Promise<void>;
 	setMaxMistakes: (max: number) => Promise<void>;
+	setMaxHints: (max: number) => Promise<void>;
 	setLastGameResult: (result: GameResult | null) => void;
 	setDeferredPrompt: (prompt: BeforeInstallPromptEvent | null) => void;
 	setLanguage: (lang: Language) => void;
@@ -117,6 +119,7 @@ const DEFAULT_PREFS = {
 	selectedDifficulty: 'beginner' as Difficulty,
 	allowNotes: true,
 	maxMistakes: 3,
+	maxHints: 3,
 };
 
 export const useGameStore = create<GameStore>()(
@@ -127,6 +130,7 @@ export const useGameStore = create<GameStore>()(
 			selectedDifficulty: DEFAULT_PREFS.selectedDifficulty,
 			allowNotes: DEFAULT_PREFS.allowNotes,
 			maxMistakes: DEFAULT_PREFS.maxMistakes,
+			maxHints: DEFAULT_PREFS.maxHints,
 			lastGameResult: null,
 			language: getInitialLanguage(),
 			dialog: {
@@ -166,6 +170,7 @@ export const useGameStore = create<GameStore>()(
 						selectedDifficulty: prefs.difficulty,
 						allowNotes: prefs.allowNotes,
 						maxMistakes: prefs.maxMistakes,
+						maxHints: typeof prefs.maxHints === 'number' ? prefs.maxHints : DEFAULT_PREFS.maxHints,
 					});
 				} else {
 					// It's a new player or first time session
@@ -175,6 +180,7 @@ export const useGameStore = create<GameStore>()(
 						difficulty: DEFAULT_PREFS.selectedDifficulty,
 						allowNotes: DEFAULT_PREFS.allowNotes,
 						maxMistakes: DEFAULT_PREFS.maxMistakes,
+						maxHints: DEFAULT_PREFS.maxHints,
 					});
 				}
 			},
@@ -209,6 +215,17 @@ export const useGameStore = create<GameStore>()(
 					await db.preferences.where('playerId').equals(activePlayerId).modify({ maxMistakes });
 				} catch (err) {
 					console.error('Failed to persist maxMistakes preference:', err);
+				}
+			},
+
+			setMaxHints: async (maxHints) => {
+				set({ maxHints });
+				const { activePlayerId } = get();
+				if (!activePlayerId) return;
+				try {
+					await db.preferences.where('playerId').equals(activePlayerId).modify({ maxHints });
+				} catch (err) {
+					console.error('Failed to persist maxHints preference:', err);
 				}
 			},
 
@@ -441,7 +458,7 @@ export const useGameStore = create<GameStore>()(
 
 			useHint: (logicalHint: HintResult) => {
 				const state = get();
-				if (state.hintsUsed >= 3 || state.currentHint) return;
+				if (state.maxHints <= 0 || state.hintsUsed >= state.maxHints || state.currentHint) return;
 
 				if (logicalHint) {
 					set({
@@ -497,6 +514,7 @@ export const useGameStore = create<GameStore>()(
 				selectedDifficulty: state.selectedDifficulty,
 				allowNotes: state.allowNotes,
 				maxMistakes: state.maxMistakes,
+				maxHints: state.maxHints,
 			}),
 		},
 	),
