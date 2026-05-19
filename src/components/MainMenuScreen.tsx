@@ -97,7 +97,7 @@ const MainMenuScreen: React.FC = () => {
 	const difficulties: Difficulty[] = ['beginner', 'intermediate', 'expert', 'master'];
 
 	return (
-		<div id="main-menu-root" className="flex flex-col h-full">
+		<div className="flex flex-col h-full">
 			{/* TopAppBar */}
 			<header className="w-full border-b border-border bg-white flex justify-between items-center px-5 h-16 z-10">
 				<button
@@ -220,10 +220,7 @@ const MainMenuScreen: React.FC = () => {
 			</main>
 
 			{/* Fixed Action Area - Positioned above BottomNavBar */}
-			<div
-				id="play-button-area"
-				className="absolute bottom-[calc(4rem+env(safe-area-inset-bottom))] w-full p-5 bg-white border-t border-border z-20"
-			>
+			<div className="absolute bottom-[calc(4rem+env(safe-area-inset-bottom))] w-full p-5 bg-white border-t border-border z-20">
 				<Button
 					variant="primary"
 					size="xl"

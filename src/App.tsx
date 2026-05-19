@@ -2,7 +2,6 @@ import { AnimatePresence } from 'framer-motion';
 import { lazy, Suspense } from 'react';
 import BottomNavBar from './components/BottomNavBar';
 import ConfirmDialog from './components/ConfirmDialog';
-import DebugOverlay from './components/DebugOverlay';
 import Layout from './components/Layout';
 import OrientationOverlay from './components/OrientationOverlay';
 import ReloadPrompt from './components/ReloadPrompt';
@@ -56,7 +55,6 @@ function App() {
 			<ReloadPrompt />
 			<OrientationOverlay />
 			<ConfirmDialog />
-			<DebugOverlay />
 		</Layout>
 	);
 }

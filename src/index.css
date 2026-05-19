@@ -9,11 +9,6 @@
 }
 
 :root {
-	--sat: env(safe-area-inset-top);
-	--sar: env(safe-area-inset-right);
-	--sab: env(safe-area-inset-bottom);
-	--sal: env(safe-area-inset-left);
-
 	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
