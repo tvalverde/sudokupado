@@ -8,7 +8,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
 		<div
 			id="layout-outer"
-			className="h-[100dvh] bg-[#f1f5f9] flex items-center justify-center p-0 md:p-6 overflow-hidden"
+			className="h-[100svh] bg-[#f1f5f9] flex items-center justify-center p-0 md:p-6 overflow-hidden"
 		>
 			{/* 
 				Adaptive Container:
