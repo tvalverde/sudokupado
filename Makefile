@@ -43,16 +43,17 @@ test:
 check: lint typecheck test
 
 # Run E2E tests inside the official Playwright container
+# Uses node_modules from the host (must be installed beforehand via `make install`)
 e2e:
-	$(DOCKER_RUN) bash -c "npm ci && npx playwright test"
+	$(DOCKER_RUN) npx playwright test
 
 # Regenerate Playwright snapshots inside the container
 e2e-update:
-	$(DOCKER_RUN) bash -c "npm ci && npx playwright test --update-snapshots"
+	$(DOCKER_RUN) npx playwright test --update-snapshots
 
 # Open Playwright UI mode inside the container (requires browser access)
 e2e-ui:
-	$(DOCKER_RUN_TTY) bash -c "npm ci && npx playwright test --ui-port=8080 --ui-host=0.0.0.0"
+	$(DOCKER_RUN_TTY) npx playwright test --ui-port=8080 --ui-host=0.0.0.0
 
 # Build a local Playwright image with make and project tooling
 e2e-build:
