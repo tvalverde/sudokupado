@@ -1,4 +1,11 @@
-.PHONY: install dev build lint format typecheck test check
+.PHONY: install dev build lint format typecheck test check e2e e2e-update e2e-ui e2e-build
+
+PLAYWRIGHT_IMAGE := mcr.microsoft.com/playwright:v1.60.0-noble
+PLAYWRIGHT_LOCAL_IMAGE := pwarush/playwright:local
+DOCKER_RUN := docker run --rm -it --ipc=host --network host \
+	-v $(CURDIR):/work -w /work \
+	-e CI=$(CI) \
+	$(PLAYWRIGHT_IMAGE)
 
 # Install dependencies
 install:
@@ -30,3 +37,19 @@ test:
 
 # Full quality gate check
 check: lint typecheck test
+
+# Run E2E tests inside the official Playwright container
+e2e:
+	$(DOCKER_RUN) bash -c "npm ci && npx playwright test"
+
+# Regenerate Playwright snapshots inside the container
+e2e-update:
+	$(DOCKER_RUN) bash -c "npm ci && npx playwright test --update-snapshots"
+
+# Open Playwright UI mode inside the container (requires browser access)
+e2e-ui:
+	$(DOCKER_RUN) bash -c "npm ci && npx playwright test --ui-port=8080 --ui-host=0.0.0.0"
+
+# Build a local Playwright image with make and project tooling
+e2e-build:
+	docker build -t $(PLAYWRIGHT_LOCAL_IMAGE) -f docker/playwright.Dockerfile .

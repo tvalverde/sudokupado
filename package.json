@@ -13,6 +13,8 @@
 		"preview": "vite preview",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"e2e": "playwright test",
+		"e2e:update": "playwright test --update-snapshots",
 		"prepare": "husky"
 	},
 	"lint-staged": {
