@@ -2,10 +2,14 @@
 
 PLAYWRIGHT_IMAGE := mcr.microsoft.com/playwright:v1.60.0-noble
 PLAYWRIGHT_LOCAL_IMAGE := pwarush/playwright:local
-DOCKER_RUN := docker run --rm -it --ipc=host --network host \
+HOST_UID := $(shell id -u)
+HOST_GID := $(shell id -g)
+DOCKER_RUN_BASE := docker run --rm --ipc=host --network host \
 	-v $(CURDIR):/work -w /work \
-	-e CI=$(CI) \
-	$(PLAYWRIGHT_IMAGE)
+	-u $(HOST_UID):$(HOST_GID) \
+	-e CI=$(CI) -e HOME=/tmp
+DOCKER_RUN := $(DOCKER_RUN_BASE) $(PLAYWRIGHT_IMAGE)
+DOCKER_RUN_TTY := $(DOCKER_RUN_BASE) -it $(PLAYWRIGHT_IMAGE)
 
 # Install dependencies
 install:
@@ -48,7 +52,7 @@ e2e-update:
 
 # Open Playwright UI mode inside the container (requires browser access)
 e2e-ui:
-	$(DOCKER_RUN) bash -c "npm ci && npx playwright test --ui-port=8080 --ui-host=0.0.0.0"
+	$(DOCKER_RUN_TTY) bash -c "npm ci && npx playwright test --ui-port=8080 --ui-host=0.0.0.0"
 
 # Build a local Playwright image with make and project tooling
 e2e-build:
