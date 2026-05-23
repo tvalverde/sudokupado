@@ -27,3 +27,9 @@ dist-ssr
 docs/spec.md
 docs/stitch/
 TODO.md
+plan-*.md
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
