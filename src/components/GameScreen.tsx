@@ -449,6 +449,7 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
+						data-testid="action-notes"
 						onClick={() => {
 							vibrate(10);
 							setNoteMode(!isNoteMode);
@@ -466,6 +467,7 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
+						data-testid="action-hint"
 						onClick={async () => {
 							vibrate(10);
 							if (maxHints <= 0 || hintsUsed >= maxHints || currentHint) return;

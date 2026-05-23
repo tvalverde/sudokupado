@@ -142,7 +142,13 @@ const MainMenuScreen: React.FC = () => {
 								{t(`main_menu.difficulties.${savedGame.difficulty}`)}
 							</span>
 						</div>
-						<Button variant="primary" size="sm" onClick={handleResumeGame} className="gap-2">
+						<Button
+							variant="primary"
+							size="sm"
+							onClick={handleResumeGame}
+							className="gap-2"
+							data-testid="resume-saved-game"
+						>
 							<PlayCircle className="w-4 h-4" />
 							{t('game.resume').toUpperCase()}
 						</Button>
@@ -159,6 +165,7 @@ const MainMenuScreen: React.FC = () => {
 							<button
 								type="button"
 								key={diff}
+								data-testid={`difficulty-${diff}`}
 								disabled={isLoading}
 								onClick={() => setDifficulty(diff)}
 								className={`w-full py-4 px-4 rounded-full font-sans text-base transition-colors border ${
@@ -206,6 +213,7 @@ const MainMenuScreen: React.FC = () => {
 							<button
 								type="button"
 								key={limit}
+								data-testid={`max-mistakes-${limit}`}
 								disabled={isLoading}
 								onClick={() => setMaxMistakes(limit)}
 								className={`w-16 h-16 rounded-full font-hanken text-xl flex items-center justify-center transition-all border ${
@@ -230,6 +238,7 @@ const MainMenuScreen: React.FC = () => {
 							<button
 								type="button"
 								key={limit}
+								data-testid={`max-hints-${limit}`}
 								disabled={isLoading}
 								onClick={() => setMaxHints(limit)}
 								className={`w-16 h-16 rounded-full font-hanken text-xl flex items-center justify-center transition-all border ${
@@ -253,6 +262,7 @@ const MainMenuScreen: React.FC = () => {
 					className="w-full uppercase shadow-lg"
 					disabled={isLoading}
 					onClick={handleStartGame}
+					data-testid="start-game-button"
 				>
 					{isLoading ? (
 						<div className="flex items-center justify-center gap-3">
