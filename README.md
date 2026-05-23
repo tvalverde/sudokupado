@@ -20,7 +20,7 @@ SUDOKUPADO is a premium, minimalist, and offline-first Progressive Web App (PWA)
 - **Database:** Dexie.js (IndexedDB).
 - **Animations:** Framer Motion.
 - **Icons:** Lucide React.
-- **Quality Gate:** Biome (Linter & Formatter), Vitest (Unit & Integration tests).
+- **Quality Gate:** Biome (Linter & Formatter), Vitest (Unit & Integration tests), Playwright (End-to-end tests, see `e2e/README.md`).
 
 ## Development
 
@@ -38,7 +38,13 @@ make check
 
 # Build for production
 make build
+
+# Run end-to-end suite (Playwright, inside the official container)
+make e2e
 ```
+
+See [`e2e/README.md`](./e2e/README.md) for details about the
+end-to-end safety net.
 
 ---
 
