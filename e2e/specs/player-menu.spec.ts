@@ -40,17 +40,20 @@ const readDbCounts = (page: import('@playwright/test').Page, playerId: number) =
 
 test.describe('Player menu', () => {
 	test('creating a player sets it as active', async ({ page, seedAndGoto }) => {
-		await seedAndGoto();
+		await seedAndGoto('/sudokupado/', {
+			zustand: { activePlayerId: null },
+			skipPlayer: true,
+		});
+		expect(await readActivePlayerId(page)).toBeNull();
+
 		await page.getByTestId('open-player-menu').click();
 		await page.getByTestId('player-create-button').click();
 		const nameInput = page.getByTestId('player-name-input');
 		await nameInput.fill('Alice');
 		await expect(nameInput).toHaveValue('Alice');
 		await page.getByTestId('player-create-confirm').click();
-		await expect.poll(() => readActivePlayerId(page), { timeout: 10_000 }).not.toBeNull();
-		const newId = await readActivePlayerId(page);
-		expect(typeof newId).toBe('number');
-		expect(newId).not.toBe(1);
+
+		await expect.poll(() => readActivePlayerId(page), { timeout: 10_000 }).toBeGreaterThan(0);
 	});
 
 	test('switching to guest clears the active player id', async ({ page, seedAndGoto }) => {
