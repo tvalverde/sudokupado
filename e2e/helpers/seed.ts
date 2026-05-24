@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import type { GameState } from '../../src/types';
+import type { GameState, HistoryEntry } from '../../src/types';
 import {
 	DEFAULT_PLAYER_ID,
 	DEXIE_DB_NAME,
@@ -13,6 +13,7 @@ import {
 export interface SeedOptions {
 	zustand?: Partial<ZustandPersistedState>;
 	gameState?: Omit<GameState, 'id' | 'playerId'>;
+	history?: Omit<HistoryEntry, 'id' | 'playerId'>[];
 	skipPlayer?: boolean;
 }
 
@@ -23,6 +24,7 @@ interface DexieSeedPayload {
 	player: ReturnType<typeof defaultPlayer> | null;
 	preferences: ReturnType<typeof defaultPreferences> | null;
 	gameState: (Omit<GameState, 'id' | 'playerId'> & { playerId: number }) | null;
+	history: (Omit<HistoryEntry, 'id' | 'playerId'> & { playerId: number })[] | null;
 }
 
 const DEXIE_INTERNAL_VERSION = 20;
@@ -36,7 +38,8 @@ const BOOTSTRAP_HTML = `<!doctype html>
 </html>`;
 
 const seedDexieFromBootstrap = (payload: DexieSeedPayload): Promise<void> => {
-	const { dbName, dexieVersion, defaultPlayerId, player, preferences, gameState } = payload;
+	const { dbName, dexieVersion, defaultPlayerId, player, preferences, gameState, history } =
+		payload;
 
 	return new Promise<void>((resolve, reject) => {
 		const deleteRequest = indexedDB.deleteDatabase(dbName);
@@ -83,7 +86,7 @@ const seedDexieFromBootstrap = (payload: DexieSeedPayload): Promise<void> => {
 
 			openRequest.onsuccess = () => {
 				const db = openRequest.result;
-				const stores = ['players', 'preferences', 'gameState'];
+				const stores = ['players', 'preferences', 'gameState', 'history'];
 				const tx = db.transaction(stores, 'readwrite');
 				tx.onerror = () => reject(tx.error);
 				tx.oncomplete = () => {
@@ -99,6 +102,12 @@ const seedDexieFromBootstrap = (payload: DexieSeedPayload): Promise<void> => {
 				}
 				if (gameState) {
 					tx.objectStore('gameState').put(gameState);
+				}
+				if (history) {
+					const historyStore = tx.objectStore('history');
+					for (const entry of history) {
+						historyStore.put(entry);
+					}
 				}
 			};
 		};
@@ -127,6 +136,7 @@ export const seedAndNavigate = async (
 					maxHints: zustand.state.maxHints,
 				}),
 		gameState: options.gameState ? { ...options.gameState, playerId } : null,
+		history: options.history ? options.history.map((entry) => ({ ...entry, playerId })) : null,
 	};
 
 	await page.route(BOOTSTRAP_URL_PATTERN, (route) =>
