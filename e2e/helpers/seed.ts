@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import type { GameState, HistoryEntry } from '../../src/types';
+import type { GameState, HistoryEntry, Player, Preferences } from '../../src/types';
 import {
 	DEFAULT_PLAYER_ID,
 	DEXIE_DB_NAME,
@@ -14,6 +14,8 @@ export interface SeedOptions {
 	zustand?: Partial<ZustandPersistedState>;
 	gameState?: Omit<GameState, 'id' | 'playerId'>;
 	history?: Omit<HistoryEntry, 'id' | 'playerId'>[];
+	extraPlayers?: (Player & { id: number })[];
+	extraPreferences?: Preferences[];
 	skipPlayer?: boolean;
 }
 
@@ -25,6 +27,8 @@ interface DexieSeedPayload {
 	preferences: ReturnType<typeof defaultPreferences> | null;
 	gameState: (Omit<GameState, 'id' | 'playerId'> & { playerId: number }) | null;
 	history: (Omit<HistoryEntry, 'id' | 'playerId'> & { playerId: number })[] | null;
+	extraPlayers: (Player & { id: number })[] | null;
+	extraPreferences: Preferences[] | null;
 }
 
 const DEXIE_INTERNAL_VERSION = 20;
@@ -38,8 +42,17 @@ const BOOTSTRAP_HTML = `<!doctype html>
 </html>`;
 
 const seedDexieFromBootstrap = (payload: DexieSeedPayload): Promise<void> => {
-	const { dbName, dexieVersion, defaultPlayerId, player, preferences, gameState, history } =
-		payload;
+	const {
+		dbName,
+		dexieVersion,
+		defaultPlayerId,
+		player,
+		preferences,
+		gameState,
+		history,
+		extraPlayers,
+		extraPreferences,
+	} = payload;
 
 	return new Promise<void>((resolve, reject) => {
 		const deleteRequest = indexedDB.deleteDatabase(dbName);
@@ -109,6 +122,18 @@ const seedDexieFromBootstrap = (payload: DexieSeedPayload): Promise<void> => {
 						historyStore.put(entry);
 					}
 				}
+				if (extraPlayers) {
+					const playersStore = tx.objectStore('players');
+					for (const extraPlayer of extraPlayers) {
+						playersStore.put(extraPlayer);
+					}
+				}
+				if (extraPreferences) {
+					const prefsStore = tx.objectStore('preferences');
+					for (const extraPref of extraPreferences) {
+						prefsStore.put(extraPref);
+					}
+				}
 			};
 		};
 	});
@@ -137,6 +162,8 @@ export const seedAndNavigate = async (
 				}),
 		gameState: options.gameState ? { ...options.gameState, playerId } : null,
 		history: options.history ? options.history.map((entry) => ({ ...entry, playerId })) : null,
+		extraPlayers: options.extraPlayers ?? null,
+		extraPreferences: options.extraPreferences ?? null,
 	};
 
 	await page.route(BOOTSTRAP_URL_PATTERN, (route) =>
