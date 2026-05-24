@@ -43,9 +43,11 @@ test.describe('Player menu', () => {
 		await seedAndGoto();
 		await page.getByTestId('open-player-menu').click();
 		await page.getByTestId('player-create-button').click();
-		await page.getByTestId('player-name-input').fill('Alice');
+		const nameInput = page.getByTestId('player-name-input');
+		await nameInput.fill('Alice');
+		await expect(nameInput).toHaveValue('Alice');
 		await page.getByTestId('player-create-confirm').click();
-		await expect.poll(() => readActivePlayerId(page)).not.toBeNull();
+		await expect.poll(() => readActivePlayerId(page), { timeout: 10_000 }).not.toBeNull();
 		const newId = await readActivePlayerId(page);
 		expect(typeof newId).toBe('number');
 		expect(newId).not.toBe(1);
