@@ -126,6 +126,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 									{activePlayerId !== null && (
 										<button
 											type="button"
+											data-testid="player-switch-guest"
 											onClick={() => {
 												setActivePlayer(null);
 												onClose();
@@ -147,6 +148,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 										<button
 											key={player.id}
 											type="button"
+											data-testid={`player-switch-${player.id}`}
 											onClick={() => {
 												setActivePlayer(player.id!);
 												onClose(); // Auto-close on selection
@@ -163,6 +165,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 											</div>
 											<button
 												type="button"
+												data-testid={`player-delete-${player.id}`}
 												onClick={(e) => {
 													e.stopPropagation();
 													handleDeletePlayer(player.id!, player.name);
@@ -180,6 +183,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 								<div className="flex flex-col gap-2 mt-2">
 									<input
 										type="text"
+										data-testid="player-name-input"
 										value={newPlayerName}
 										onChange={(e) => setNewPlayerName(e.target.value)}
 										placeholder={t('player_menu.enter_name')}
@@ -190,6 +194,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 										<Button
 											variant="primary"
 											size="sm"
+											data-testid="player-create-confirm"
 											onClick={handleCreatePlayer}
 											className="flex-1"
 										>
@@ -198,6 +203,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 										<Button
 											variant="secondary"
 											size="sm"
+											data-testid="player-create-cancel"
 											onClick={() => setIsCreating(false)}
 											className="flex-1"
 										>
@@ -213,6 +219,7 @@ const PlayerMenu: React.FC<PlayerMenuProps> = ({ isOpen, onClose }) => {
 							<div className="p-4 border-t border-subtle-bg bg-subtle-bg">
 								<button
 									type="button"
+									data-testid="player-create-button"
 									onClick={() => setIsCreating(true)}
 									className="w-full bg-primary-text text-white rounded-full py-4 px-6 flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors active:scale-95 shadow-sm"
 								>

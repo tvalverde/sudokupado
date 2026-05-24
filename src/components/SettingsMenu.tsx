@@ -216,6 +216,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 										<input
 											type="file"
 											ref={fileInputRef}
+											data-testid="settings-import-input"
 											className="hidden"
 											accept=".json"
 											onChange={handleFileChange}
