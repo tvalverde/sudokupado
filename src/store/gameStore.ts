@@ -519,3 +519,7 @@ export const useGameStore = create<GameStore>()(
 		},
 	),
 );
+
+if (import.meta.env.VITE_E2E === '1' && typeof window !== 'undefined') {
+	(window as unknown as { __useGameStore: typeof useGameStore }).__useGameStore = useGameStore;
+}

@@ -36,5 +36,8 @@ export default defineConfig({
 		url: 'http://localhost:5173/sudokupado/',
 		reuseExistingServer: !process.env.CI,
 		timeout: 120_000,
+		env: {
+			VITE_E2E: '1',
+		},
 	},
 });
