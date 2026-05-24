@@ -40,3 +40,7 @@ export class SudokupadoDB extends Dexie {
 
 // Singleton instance for the whole app
 export const db = new SudokupadoDB();
+
+if (import.meta.env.VITE_E2E === '1' && typeof window !== 'undefined') {
+	(window as unknown as { __db: typeof db }).__db = db;
+}
