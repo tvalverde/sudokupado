@@ -121,6 +121,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 								</h2>
 								<button
 									type="button"
+									data-testid="settings-close"
 									onClick={onClose}
 									className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 								>
@@ -161,6 +162,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
 											<button
 												type="button"
 												key={lang}
+												data-testid={`language-toggle-${lang}`}
 												onClick={() => setLanguage(lang)}
 												className={`flex-1 py-3 rounded-full font-hanken text-xs font-bold uppercase transition-all border ${
 													language === lang

@@ -22,6 +22,8 @@ const BottomNavBar: React.FC = () => {
 					return (
 						<button
 							key={item.id}
+							type="button"
+							data-testid={`nav-${item.id}`}
 							onClick={() => setScreen(item.id)}
 							className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${
 								isActive ? 'text-primary-text' : 'text-secondary hover:text-primary-text'

@@ -16,6 +16,8 @@ const RulesScreen: React.FC = () => {
 			{/* Header */}
 			<header className="sticky top-0 w-full z-50 bg-white border-b border-border flex justify-between items-center h-16 px-5">
 				<button
+					type="button"
+					data-testid="rules-back"
 					onClick={() => setScreen('main')}
 					className="p-2 -ml-2 hover:bg-subtle-bg rounded-full transition-colors text-primary-text"
 				>

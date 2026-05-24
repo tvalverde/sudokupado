@@ -104,6 +104,7 @@ const MainMenuScreen: React.FC = () => {
 			<header className="w-full border-b border-border bg-white flex justify-between items-center px-5 h-16 z-10">
 				<button
 					type="button"
+					data-testid="open-player-menu"
 					onClick={() => setIsPlayerMenuOpen(true)}
 					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 				>
@@ -114,6 +115,7 @@ const MainMenuScreen: React.FC = () => {
 				</h1>
 				<button
 					type="button"
+					data-testid="open-settings"
 					onClick={() => setIsSettingsOpen(true)}
 					className="p-2 hover:bg-subtle-bg rounded-full transition-colors"
 				>

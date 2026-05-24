@@ -185,6 +185,7 @@ const ResultScreen: React.FC = () => {
 					className="w-full gap-2"
 					onClick={handleNewGame}
 					disabled={isLoading}
+					data-testid="result-new-game"
 				>
 					{isLoading ? (
 						<div className="flex items-center justify-center gap-3">
@@ -226,6 +227,7 @@ const ResultScreen: React.FC = () => {
 						size="lg"
 						className="w-full gap-2"
 						onClick={() => setScreen('trophies')}
+						data-testid="result-leaderboard"
 					>
 						<Trophy className="w-5 h-5" />
 						{t('result.view_leaderboard') || 'CLASIFICACIÓN'}
@@ -235,6 +237,7 @@ const ResultScreen: React.FC = () => {
 						size="lg"
 						className="w-full gap-2"
 						onClick={() => setScreen('main')}
+						data-testid="result-return-home"
 					>
 						<Home className="w-5 h-5" />
 						{t('result.return_home')}

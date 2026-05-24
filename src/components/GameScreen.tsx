@@ -346,6 +346,7 @@ const GameScreen: React.FC = () => {
 				</h1>
 				<button
 					type="button"
+					data-testid="pause-toggle"
 					onClick={() => setPaused(!isPaused)}
 					className="p-2 hover:bg-subtle-bg rounded-full transition-colors text-secondary"
 				>
@@ -439,6 +440,7 @@ const GameScreen: React.FC = () => {
 				>
 					<button
 						type="button"
+						data-testid="action-erase"
 						onClick={handleErase}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg transition-all active:scale-95"
 					>
@@ -507,6 +509,7 @@ const GameScreen: React.FC = () => {
 					</button>
 					<button
 						type="button"
+						data-testid="action-restart"
 						onClick={handleRestartClick}
 						className="flex flex-col items-center justify-center py-3 bg-white border border-border rounded-xl text-primary-text hover:bg-subtle-bg transition-all active:scale-95"
 					>
